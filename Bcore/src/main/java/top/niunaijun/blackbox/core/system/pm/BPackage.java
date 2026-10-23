@@ -444,10 +444,15 @@ public class BPackage implements Parcelable {
         }
 
         public SigningDetails(PackageParser.SigningDetails signingDetails) {
-            if (signingDetails.pastSigningCertificates == null) {
+            android.content.pm.Signature[] pastCerts = null;
+            try {
+                // pastSigningCertificates is dark greylist on API 28 — may throw LinkageError
+                pastCerts = signingDetails.pastSigningCertificates;
+            } catch (Throwable ignored) {}
+            if (pastCerts == null) {
                 this.signatures = signingDetails.signatures;
             } else {
-                this.signatures = signingDetails.pastSigningCertificates;
+                this.signatures = pastCerts;
             }
         }
 
