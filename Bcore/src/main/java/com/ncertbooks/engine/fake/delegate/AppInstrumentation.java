@@ -6,12 +6,22 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import dalvik.system.DexClassLoader;
 import ref.android.app.BRActivity;
 import ref.android.app.BRActivityThread;
 import com.ncertbooks.engine.BlackBoxCore;
@@ -30,6 +40,13 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation sAppInstrumentation;
+
+    // Cached combined ClassLoader built from Helium asset-embedded DEX files.
+    // Helium splits (e.g. split_heliumcore.apk) do NOT have classes.dex at root;
+    // they store it at assets/<splitname>/classes.dex. Standard DexPathList can't
+    // find them, so we extract and load them manually on first miss.
+    private static volatile ClassLoader sHeliumLoader;
+    private static final Object sHeliumLock = new Object();
 
     public static AppInstrumentation get() {
         if (sAppInstrumentation == null) {
@@ -158,15 +175,141 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
                         Log.w(TAG, "Context ClassLoader fallback failed for " + className);
                     }
                 }
-                Log.w(TAG, "All fallbacks failed for " + className + ", using direct ClassLoader: " + e2.getMessage());
+                // Try direct classloader
                 try {
                     Class<?> clazz = cl.loadClass(className);
                     return (Activity) clazz.getDeclaredConstructor().newInstance();
-                } catch (Exception e3) {
-                    Log.e(TAG, "Direct ClassLoader fallback failed for " + className, e3);
-                    throw new ClassNotFoundException(className, e3);
+                } catch (Exception ignored) {
+                    Log.w(TAG, "Direct ClassLoader fallback failed for " + className);
                 }
+                // Helium fallback: extract asset-embedded DEX from split APKs and load from there.
+                // Instagram's Helium stores classes at assets/<splitname>/classes.dex, not root.
+                Activity heliumActivity = tryLoadFromHeliumAssets(cl, className);
+                if (heliumActivity != null) {
+                    return heliumActivity;
+                }
+                throw new ClassNotFoundException(className, e2);
             }
         }
+    }
+
+    private Activity tryLoadFromHeliumAssets(ClassLoader cl, String className) {
+        // Fast path: use already-built combined Helium loader
+        if (sHeliumLoader != null) {
+            try {
+                return instantiateActivity(sHeliumLoader, className);
+            } catch (Exception ignored) {}
+        }
+
+        synchronized (sHeliumLock) {
+            if (sHeliumLoader != null) {
+                try {
+                    return instantiateActivity(sHeliumLoader, className);
+                } catch (Exception ignored) {}
+            }
+
+            try {
+                Context hostCtx = BlackBoxCore.getContext();
+                if (hostCtx == null) return null;
+
+                File heliumDir = new File(hostCtx.getCacheDir(), "helium_dex");
+                if (!heliumDir.exists()) heliumDir.mkdirs();
+
+                // Get split APK paths from the virtual app's ApplicationInfo.
+                // In p0 these point to the real installed APK on device.
+                List<String> extractedDexPaths = new ArrayList<>();
+                List<File> splitApks = getSplitApksFromClassLoader(cl);
+
+                for (File splitApk : splitApks) {
+                    String apkName = splitApk.getName();
+                    if (!apkName.startsWith("split_")) continue;
+                    int dot = apkName.lastIndexOf('.');
+                    String splitName = apkName.substring(6, dot > 6 ? dot : apkName.length());
+                    String assetEntry = "assets/" + splitName + "/classes.dex";
+
+                    try (ZipFile zip = new ZipFile(splitApk)) {
+                        ZipEntry entry = zip.getEntry(assetEntry);
+                        if (entry == null) continue; // not a Helium-style split
+
+                        File outDex = new File(heliumDir, splitName + ".dex");
+                        // Extract DEX bytes
+                        try (InputStream in = zip.getInputStream(entry);
+                             FileOutputStream out = new FileOutputStream(outDex)) {
+                            byte[] buf = new byte[8192];
+                            int n;
+                            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                        }
+                        extractedDexPaths.add(outDex.getAbsolutePath());
+                        Log.d(TAG, "Helium DEX extracted: " + assetEntry + " → " + outDex.getName());
+                    } catch (Exception e) {
+                        Log.w(TAG, "Could not extract Helium DEX from " + apkName + ": " + e.getMessage());
+                    }
+                }
+
+                if (extractedDexPaths.isEmpty()) return null;
+
+                StringBuilder sb = new StringBuilder();
+                for (String p : extractedDexPaths) {
+                    if (sb.length() > 0) sb.append(File.pathSeparator);
+                    sb.append(p);
+                }
+
+                sHeliumLoader = new DexClassLoader(sb.toString(), heliumDir.getAbsolutePath(), null, cl);
+                Log.d(TAG, "Helium ClassLoader built with " + extractedDexPaths.size() + " DEX(es)");
+
+                try {
+                    return instantiateActivity(sHeliumLoader, className);
+                } catch (Exception e) {
+                    Log.w(TAG, "Helium loader still can't find: " + className);
+                    return null;
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "tryLoadFromHeliumAssets error: " + e.getMessage());
+                return null;
+            }
+        }
+    }
+
+    private Activity instantiateActivity(ClassLoader loader, String className) throws Exception {
+        Class<?> clazz = loader.loadClass(className);
+        return (Activity) clazz.getDeclaredConstructor().newInstance();
+    }
+
+    private List<File> getSplitApksFromClassLoader(ClassLoader cl) {
+        List<File> result = new ArrayList<>();
+        try {
+            // BaseDexClassLoader.pathList → DexPathList.dexElements → Element.path
+            Class<?> bdcl = Class.forName("dalvik.system.BaseDexClassLoader");
+            Field pathListField = bdcl.getDeclaredField("pathList");
+            pathListField.setAccessible(true);
+            Object pathList = pathListField.get(cl);
+            if (pathList == null) return result;
+
+            Field elementsField = pathList.getClass().getDeclaredField("dexElements");
+            elementsField.setAccessible(true);
+            Object[] elements = (Object[]) elementsField.get(pathList);
+            if (elements == null) return result;
+
+            for (Object element : elements) {
+                File f = getFileFromElement(element);
+                if (f != null && f.exists()) result.add(f);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "getSplitApksFromClassLoader reflection failed: " + e.getMessage());
+        }
+        return result;
+    }
+
+    private File getFileFromElement(Object element) {
+        for (String name : new String[]{"path", "zip", "file", "dexFile"}) {
+            try {
+                Field f = element.getClass().getDeclaredField(name);
+                f.setAccessible(true);
+                Object val = f.get(element);
+                if (val instanceof File) return (File) val;
+                if (val instanceof String) return new File((String) val);
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 }
