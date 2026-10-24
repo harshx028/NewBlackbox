@@ -144,7 +144,20 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
         try {
             return super.newActivity(cl, className, intent);
         } catch (ClassNotFoundException e) {
-            return mBaseInstrumentation.newActivity(cl, className, intent);
+            try {
+                return mBaseInstrumentation.newActivity(cl, className, intent);
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e2) {
+                // App's own AppComponentFactory also failed (e.g. due to split APK dex issues).
+                // Fall back to loading the class directly from the provided ClassLoader.
+                Log.w(TAG, "AppComponentFactory failed for " + className + ", using direct ClassLoader: " + e2.getMessage());
+                try {
+                    Class<?> clazz = cl.loadClass(className);
+                    return (Activity) clazz.getDeclaredConstructor().newInstance();
+                } catch (Exception e3) {
+                    Log.e(TAG, "Direct ClassLoader fallback failed for " + className, e3);
+                    throw new ClassNotFoundException(className, e3);
+                }
+            }
         }
     }
 }

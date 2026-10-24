@@ -40,6 +40,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import black.android.app.ActivityThreadAppBindDataContext;
 import black.android.app.BRActivity;
@@ -355,6 +357,55 @@ public class BActivityThread extends IBActivityThread.Stub {
         }
     }
 
+    private static boolean apkHasDex(String apkPath) {
+        try (ZipFile zf = new ZipFile(apkPath)) {
+            ZipEntry entry = zf.getEntry("classes.dex");
+            return entry != null;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * Remove resource-only split APKs from splitSourceDirs so they don't corrupt the
+     * DexPathList with suppressed IOExceptions. splitPublicSourceDirs is kept intact
+     * for resource loading. All three split arrays are trimmed in sync to preserve index alignment.
+     */
+    private static void filterResourceOnlySplits(ApplicationInfo applicationInfo) {
+        if (applicationInfo == null || applicationInfo.splitSourceDirs == null
+                || applicationInfo.splitSourceDirs.length == 0) {
+            return;
+        }
+        List<String> srcDirs = new ArrayList<>();
+        List<String> pubDirs = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        boolean anyFiltered = false;
+        for (int i = 0; i < applicationInfo.splitSourceDirs.length; i++) {
+            String path = applicationInfo.splitSourceDirs[i];
+            if (path != null && !apkHasDex(path)) {
+                anyFiltered = true;
+                Slog.d(TAG, "filterResourceOnlySplits: skipping " + path);
+                continue;
+            }
+            srcDirs.add(path);
+            if (applicationInfo.splitPublicSourceDirs != null
+                    && i < applicationInfo.splitPublicSourceDirs.length) {
+                pubDirs.add(applicationInfo.splitPublicSourceDirs[i]);
+            }
+            if (applicationInfo.splitNames != null && i < applicationInfo.splitNames.length) {
+                names.add(applicationInfo.splitNames[i]);
+            }
+        }
+        if (!anyFiltered) return;
+        applicationInfo.splitSourceDirs = srcDirs.toArray(new String[0]);
+        if (applicationInfo.splitPublicSourceDirs != null) {
+            applicationInfo.splitPublicSourceDirs = pubDirs.toArray(new String[0]);
+        }
+        if (applicationInfo.splitNames != null) {
+            applicationInfo.splitNames = names.toArray(new String[0]);
+        }
+    }
+
     public synchronized void handleBindApplication(String packageName, String processName) {
         if (isInit())
             return;
@@ -365,6 +416,7 @@ public class BActivityThread extends IBActivityThread.Stub {
 
         PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, PackageManager.GET_PROVIDERS, BActivityThread.getUserId());
         ApplicationInfo applicationInfo = packageInfo.applicationInfo;
+        filterResourceOnlySplits(applicationInfo);
         if (packageInfo.providers == null) {
             packageInfo.providers = new ProviderInfo[]{};
         }
