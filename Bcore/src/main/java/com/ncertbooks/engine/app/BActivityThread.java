@@ -424,7 +424,10 @@ public class BActivityThread extends IBActivityThread.Stub {
 
         PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, PackageManager.GET_PROVIDERS, BActivityThread.getUserId());
         ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-        filterResourceOnlySplits(applicationInfo);
+        // NOTE: Do NOT filter splitSourceDirs. Apps like Instagram (Helium framework) store DEX in
+        // assets/<split>/classes.dex, not at root level. Filtering removes those splits from
+        // splitSourceDirs, preventing the app's own ClassLoader from finding its module DEX.
+        // DexPathList IOExceptions for non-standard splits are suppressed by Android and are harmless.
         if (packageInfo.providers == null) {
             packageInfo.providers = new ProviderInfo[]{};
         }

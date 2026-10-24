@@ -147,9 +147,18 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
             try {
                 return mBaseInstrumentation.newActivity(cl, className, intent);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e2) {
-                // App's own AppComponentFactory also failed (e.g. due to split APK dex issues).
-                // Fall back to loading the class directly from the provided ClassLoader.
-                Log.w(TAG, "AppComponentFactory failed for " + className + ", using direct ClassLoader: " + e2.getMessage());
+                // Try Thread context ClassLoader — frameworks like Instagram's Helium register
+                // their module ClassLoader here after Application.onCreate().
+                ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
+                if (ctxCl != null && ctxCl != cl) {
+                    try {
+                        Class<?> clazz = ctxCl.loadClass(className);
+                        return (Activity) clazz.getDeclaredConstructor().newInstance();
+                    } catch (Exception ignored) {
+                        Log.w(TAG, "Context ClassLoader fallback failed for " + className);
+                    }
+                }
+                Log.w(TAG, "All fallbacks failed for " + className + ", using direct ClassLoader: " + e2.getMessage());
                 try {
                     Class<?> clazz = cl.loadClass(className);
                     return (Activity) clazz.getDeclaredConstructor().newInstance();
