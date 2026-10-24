@@ -111,6 +111,10 @@ public class BActivityManagerService extends IBActivityManagerService.Stub imple
         if (process == null) {
             return;
         }
+        if (!(activityRecord instanceof ActivityRecord)) {
+            // stale BinderProxy from a dead black process after restart; ignore
+            return;
+        }
         ActivityRecord record = (ActivityRecord) activityRecord;
         UserSpace userSpace = getOrCreateSpaceLocked(process.userId);
         synchronized (userSpace.mStack) {
