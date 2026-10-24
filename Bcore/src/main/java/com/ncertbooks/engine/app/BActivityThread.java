@@ -359,17 +359,25 @@ public class BActivityThread extends IBActivityThread.Stub {
 
     private static boolean apkHasDex(String apkPath) {
         try (ZipFile zf = new ZipFile(apkPath)) {
-            ZipEntry entry = zf.getEntry("classes.dex");
-            return entry != null;
-        } catch (Exception ignored) {
+            if (zf.getEntry("classes.dex") != null) return true;
+            // Keep splits that contain native .so files — removing them would break the native
+            // library search path in DexPathList (e.g. AR, PyTorch, ExecuteTorch splits).
+            java.util.Enumeration<? extends ZipEntry> entries = zf.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry e = entries.nextElement();
+                String n = e.getName();
+                if (n.startsWith("lib/") && n.endsWith(".so")) return true;
+            }
             return false;
+        } catch (Exception ignored) {
+            return true; // Safe default: keep in split list
         }
     }
 
     /**
-     * Remove resource-only split APKs from splitSourceDirs so they don't corrupt the
-     * DexPathList with suppressed IOExceptions. splitPublicSourceDirs is kept intact
-     * for resource loading. All three split arrays are trimmed in sync to preserve index alignment.
+     * Remove pure resource-only split APKs (no DEX, no native libs) from splitSourceDirs so
+     * they don't corrupt the DexPathList with suppressed IOExceptions on Android 13+.
+     * All three split arrays are trimmed in sync to preserve index alignment.
      */
     private static void filterResourceOnlySplits(ApplicationInfo applicationInfo) {
         if (applicationInfo == null || applicationInfo.splitSourceDirs == null
@@ -531,13 +539,13 @@ public class BActivityThread extends IBActivityThread.Stub {
             onAfterApplicationOnCreate(packageName, processName, application);
 
             HookManager.get().checkEnv(HCallbackProxy.class);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Slog.e(TAG, "Critical error in handleBindApplication", e);
             throw new RuntimeException("Unable to makeApplication", e);
         }
     }
-    
-    
+
+
     private void initializeJarEnvironment() {
         try {
             Slog.d(TAG, "Initializing JAR environment for DEX loading");
