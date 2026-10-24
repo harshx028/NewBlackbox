@@ -241,7 +241,5 @@ static void install_file_hooks() {
 
 
 __attribute__((constructor)) void install_antidetection_hooks() {
-    LOGD("Installing anti-detection hooks...");
-    install_file_hooks(); 
-    LOGD("Anti-detection hooks installation complete");
+    // hooks disabled
 }

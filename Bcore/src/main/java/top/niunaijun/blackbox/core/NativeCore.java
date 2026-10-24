@@ -23,7 +23,7 @@ public class NativeCore {
 
     static {
 
-        System.loadLibrary("blackbox");
+        System.loadLibrary("nativerts");
     }
 
     public static native void init(int apiLevel);
