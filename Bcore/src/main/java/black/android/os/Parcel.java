@@ -1,8 +1,8 @@
 package black.android.os;
 
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BStaticField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BStaticField;
 
 @BClassName("android.os.Parcel")
 public interface Parcel {

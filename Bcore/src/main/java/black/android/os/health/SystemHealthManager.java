@@ -2,8 +2,8 @@ package black.android.os.health;
 
 import android.os.IInterface;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
 
 @BClassName("android.os.health.SystemHealthManager")
 public interface SystemHealthManager {

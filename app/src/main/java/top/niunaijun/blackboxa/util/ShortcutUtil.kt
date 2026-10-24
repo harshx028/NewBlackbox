@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.util
+package com.ncertbooks.enginea.util
 
 import android.content.Context
 import android.content.Intent
@@ -8,12 +8,12 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.app.App
-import top.niunaijun.blackboxa.app.AppManager
-import top.niunaijun.blackboxa.bean.AppInfo
-import top.niunaijun.blackboxa.util.ContextUtil.openAppSystemSettings
-import top.niunaijun.blackboxa.view.main.ShortcutActivity
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.app.App
+import com.ncertbooks.enginea.app.AppManager
+import com.ncertbooks.enginea.bean.AppInfo
+import com.ncertbooks.enginea.util.ContextUtil.openAppSystemSettings
+import com.ncertbooks.enginea.view.main.ShortcutActivity
 
 
 object ShortcutUtil {

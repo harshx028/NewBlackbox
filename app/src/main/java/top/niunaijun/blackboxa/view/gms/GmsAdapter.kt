@@ -1,12 +1,12 @@
-package top.niunaijun.blackboxa.view.gms
+package com.ncertbooks.enginea.view.gms
 
 import android.view.View
 import android.view.ViewGroup
 import cbfg.rvadapter.RVHolder
 import cbfg.rvadapter.RVHolderFactory
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.GmsBean
-import top.niunaijun.blackboxa.databinding.ItemGmsBinding
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.GmsBean
+import com.ncertbooks.enginea.databinding.ItemGmsBinding
 
 
 class GmsAdapter : RVHolderFactory() {

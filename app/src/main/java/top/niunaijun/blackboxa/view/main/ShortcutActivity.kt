@@ -1,10 +1,10 @@
-package top.niunaijun.blackboxa.view.main
+package com.ncertbooks.enginea.view.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import top.niunaijun.blackbox.BlackBoxCore
+import com.ncertbooks.engine.BlackBoxCore
 
 
 class ShortcutActivity:AppCompatActivity() {

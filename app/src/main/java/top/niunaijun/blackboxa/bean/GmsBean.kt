@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.bean
+package com.ncertbooks.enginea.bean
 
 
 data class GmsBean(val userID:Int,val userName:String,var isInstalledGms:Boolean)

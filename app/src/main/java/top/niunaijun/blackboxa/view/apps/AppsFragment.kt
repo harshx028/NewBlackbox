@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.view.apps
+package com.ncertbooks.enginea.view.apps
 
 import android.graphics.Point
 import android.os.Bundle
@@ -17,17 +17,17 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import cbfg.rvadapter.RVAdapter
 import com.afollestad.materialdialogs.MaterialDialog
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.AppInfo
-import top.niunaijun.blackboxa.databinding.FragmentAppsBinding
-import top.niunaijun.blackboxa.util.InjectionUtil
-import top.niunaijun.blackboxa.util.ShortcutUtil
-import top.niunaijun.blackboxa.util.inflate
-import top.niunaijun.blackboxa.util.MemoryManager
-import top.niunaijun.blackboxa.util.toast
-import top.niunaijun.blackboxa.view.base.LoadingActivity
-import top.niunaijun.blackboxa.view.main.MainActivity
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.AppInfo
+import com.ncertbooks.enginea.databinding.FragmentAppsBinding
+import com.ncertbooks.enginea.util.InjectionUtil
+import com.ncertbooks.enginea.util.ShortcutUtil
+import com.ncertbooks.enginea.util.inflate
+import com.ncertbooks.enginea.util.MemoryManager
+import com.ncertbooks.enginea.util.toast
+import com.ncertbooks.enginea.view.base.LoadingActivity
+import com.ncertbooks.enginea.view.main.MainActivity
 import java.util.*
 import kotlin.math.abs
 

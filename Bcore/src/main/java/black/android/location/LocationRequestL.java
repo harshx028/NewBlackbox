@@ -1,9 +1,9 @@
 package black.android.location;
 
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
-import top.niunaijun.blackreflection.annotation.BMethod;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
+import com.ncertbooks.reflect.annotation.BMethod;
 
 @BClassName("android.location.LocationRequest")
 public interface LocationRequestL {

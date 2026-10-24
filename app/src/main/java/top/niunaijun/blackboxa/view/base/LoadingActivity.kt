@@ -1,8 +1,8 @@
-package top.niunaijun.blackboxa.view.base
+package com.ncertbooks.enginea.view.base
 
 import android.view.KeyEvent
 import com.roger.catloadinglibrary.CatLoadingView
-import top.niunaijun.blackboxa.R
+import com.ncertbooks.enginea.R
 
 
 abstract class LoadingActivity : BaseActivity() {

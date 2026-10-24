@@ -1,13 +1,13 @@
-package top.niunaijun.blackboxa.util
+package com.ncertbooks.enginea.util
 
-import top.niunaijun.blackboxa.data.AppsRepository
-import top.niunaijun.blackboxa.data.FakeLocationRepository
-import top.niunaijun.blackboxa.data.GmsRepository
+import com.ncertbooks.enginea.data.AppsRepository
+import com.ncertbooks.enginea.data.FakeLocationRepository
+import com.ncertbooks.enginea.data.GmsRepository
 
-import top.niunaijun.blackboxa.view.apps.AppsFactory
-import top.niunaijun.blackboxa.view.fake.FakeLocationFactory
-import top.niunaijun.blackboxa.view.gms.GmsFactory
-import top.niunaijun.blackboxa.view.list.ListFactory
+import com.ncertbooks.enginea.view.apps.AppsFactory
+import com.ncertbooks.enginea.view.fake.FakeLocationFactory
+import com.ncertbooks.enginea.view.gms.GmsFactory
+import com.ncertbooks.enginea.view.list.ListFactory
 
 
 

@@ -1,9 +1,9 @@
-package top.niunaijun.blackboxa.widget
+package com.ncertbooks.enginea.widget
 
 import android.content.Context
 import android.view.MotionEvent
 import com.imuxuan.floatingview.FloatingMagnetView
-import top.niunaijun.blackboxa.R
+import com.ncertbooks.enginea.R
 
 
 class EnFloatView(mContext: Context) : FloatingMagnetView(mContext) {

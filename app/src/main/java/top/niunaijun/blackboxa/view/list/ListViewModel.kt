@@ -1,9 +1,9 @@
-package top.niunaijun.blackboxa.view.list
+package com.ncertbooks.enginea.view.list
 
 import androidx.lifecycle.MutableLiveData
-import top.niunaijun.blackboxa.bean.InstalledAppBean
-import top.niunaijun.blackboxa.data.AppsRepository
-import top.niunaijun.blackboxa.view.base.BaseViewModel
+import com.ncertbooks.enginea.bean.InstalledAppBean
+import com.ncertbooks.enginea.data.AppsRepository
+import com.ncertbooks.enginea.view.base.BaseViewModel
 
 
 class ListViewModel(private val repo: AppsRepository) : BaseViewModel() {

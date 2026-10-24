@@ -488,15 +488,15 @@
     <application
         android:usesCleartextTraffic="true">
         <provider
-            android:name="top.niunaijun.blackbox.core.system.SystemCallProvider"
-            android:authorities="${applicationId}.blackbox.SystemCallProvider"
+            android:name="com.ncertbooks.engine.core.system.SystemCallProvider"
+            android:authorities="${applicationId}.engine.SystemCallProvider"
             android:exported="false"
             android:process="@string/black_box_service_name" />
 
         
         <provider
             android:name=".fake.provider.FileProvider"
-            android:authorities="${applicationId}.blackbox.FileProvider"
+            android:authorities="${applicationId}.engine.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -515,13 +515,13 @@
         </receiver>
 
         <service
-            android:name="top.niunaijun.blackbox.core.system.DaemonService"
+            android:name="com.ncertbooks.engine.core.system.DaemonService"
             android:exported="false"
             android:process="@string/black_box_service_name"
             android:foregroundServiceType="specialUse" />
 
         <service
-            android:name="top.niunaijun.blackbox.core.system.DaemonService$DaemonInnerService"
+            android:name="com.ncertbooks.engine.core.system.DaemonService$DaemonInnerService"
             android:exported="false"
             android:process="@string/black_box_service_name"
             android:foregroundServiceType="specialUse" />
@@ -532,7 +532,7 @@
             android:theme="@style/LauncherTheme" />
 
         <service
-            android:name="top.niunaijun.blackbox.proxy.ProxyVpnService"
+            android:name="com.ncertbooks.engine.proxy.ProxyVpnService"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_VPN_SERVICE"

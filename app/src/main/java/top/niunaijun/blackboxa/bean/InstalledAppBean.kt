@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.bean
+package com.ncertbooks.enginea.bean
 
 import android.graphics.drawable.Drawable
 

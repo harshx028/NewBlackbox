@@ -1,12 +1,12 @@
-package top.niunaijun.blackboxa.view.main
+package com.ncertbooks.enginea.view.main
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackboxa.util.InjectionUtil
-import top.niunaijun.blackboxa.view.list.ListViewModel
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.enginea.util.InjectionUtil
+import com.ncertbooks.enginea.view.list.ListViewModel
 
 class WelcomeActivity : AppCompatActivity() {
 

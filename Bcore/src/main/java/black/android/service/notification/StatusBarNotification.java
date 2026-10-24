@@ -1,8 +1,8 @@
 package black.android.service.notification;
 
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
 
 @BClassName("android.service.notification.StatusBarNotification")
 public interface StatusBarNotification {

@@ -1,8 +1,8 @@
 package black.libcore.io;
 
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BStaticField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BStaticField;
 
 @BClassName("libcore.io.Libcore")
 public interface Libcore {

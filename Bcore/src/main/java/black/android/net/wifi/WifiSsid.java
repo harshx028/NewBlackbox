@@ -1,8 +1,8 @@
 package black.android.net.wifi;
 
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BStaticMethod;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BStaticMethod;
 
 @BClassName("android.net.wifi.WifiSsid")
 public interface WifiSsid {

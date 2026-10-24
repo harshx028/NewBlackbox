@@ -2,8 +2,8 @@ package black.android.security.net.config;
 
 import android.content.Context;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BStaticMethod;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BStaticMethod;
 
 @BClassName("android.security.net.config.NetworkSecurityConfigProvider")
 public interface NetworkSecurityConfigProvider {

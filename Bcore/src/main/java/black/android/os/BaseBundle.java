@@ -2,8 +2,8 @@ package black.android.os;
 
 import android.os.Parcel;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
 
 @BClassName("android.os.BaseBundle")
 public interface BaseBundle {

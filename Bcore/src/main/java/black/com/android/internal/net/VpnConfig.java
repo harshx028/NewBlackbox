@@ -2,8 +2,8 @@ package black.com.android.internal.net;
 
 import java.util.List;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
 
 
 @BClassName("com.android.internal.net.VpnConfig")

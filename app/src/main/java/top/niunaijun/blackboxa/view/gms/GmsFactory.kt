@@ -1,8 +1,8 @@
-package top.niunaijun.blackboxa.view.gms
+package com.ncertbooks.enginea.view.gms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import top.niunaijun.blackboxa.data.GmsRepository
+import com.ncertbooks.enginea.data.GmsRepository
 
 
 class GmsFactory(private val repo:GmsRepository): ViewModelProvider.NewInstanceFactory() {

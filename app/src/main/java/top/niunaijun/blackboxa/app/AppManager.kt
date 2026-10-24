@@ -1,9 +1,9 @@
-package top.niunaijun.blackboxa.app
+package com.ncertbooks.enginea.app
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import top.niunaijun.blackboxa.view.main.BlackBoxLoader
+import com.ncertbooks.enginea.view.main.BlackBoxLoader
 
 
 object AppManager {

@@ -1,8 +1,8 @@
 package black.android.telephony;
 
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BMethod;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BMethod;
 
 @BClassName("android.telephony.SmsManager")
 public interface SmsManager {

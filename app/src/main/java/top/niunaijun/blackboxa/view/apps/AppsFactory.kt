@@ -1,8 +1,8 @@
-package top.niunaijun.blackboxa.view.apps
+package com.ncertbooks.enginea.view.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import top.niunaijun.blackboxa.data.AppsRepository
+import com.ncertbooks.enginea.data.AppsRepository
 
 
 @Suppress("UNCHECKED_CAST")

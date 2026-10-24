@@ -3,9 +3,9 @@ package black.android.telephony;
 import android.telephony.CellIdentityCdma;
 import android.telephony.CellSignalStrengthCdma;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BConstructor;
-import top.niunaijun.blackreflection.annotation.BField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BConstructor;
+import com.ncertbooks.reflect.annotation.BField;
 
 @BClassName("android.telephony.CellInfoCdma")
 public interface CellInfoCdma {

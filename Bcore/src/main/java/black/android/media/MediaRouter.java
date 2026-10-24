@@ -2,9 +2,9 @@ package black.android.media;
 
 import android.os.IInterface;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
-import top.niunaijun.blackreflection.annotation.BStaticField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
+import com.ncertbooks.reflect.annotation.BStaticField;
 
 @BClassName("android.media.MediaRouter")
 public interface MediaRouter {

@@ -1,12 +1,12 @@
-package top.niunaijun.blackboxa.data
+package com.ncertbooks.enginea.data
 
 import androidx.lifecycle.MutableLiveData
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.app.AppManager
-import top.niunaijun.blackboxa.bean.GmsBean
-import top.niunaijun.blackboxa.bean.GmsInstallBean
-import top.niunaijun.blackboxa.util.getString
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.app.AppManager
+import com.ncertbooks.enginea.bean.GmsBean
+import com.ncertbooks.enginea.bean.GmsInstallBean
+import com.ncertbooks.enginea.util.getString
 
 
 class GmsRepository {

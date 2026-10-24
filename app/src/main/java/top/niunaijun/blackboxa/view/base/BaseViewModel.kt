@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.view.base
+package com.ncertbooks.enginea.view.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

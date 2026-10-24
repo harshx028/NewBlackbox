@@ -1,16 +1,16 @@
-package top.niunaijun.blackboxa.view.main
+package com.ncertbooks.enginea.view.main
 
 import android.app.Application
 import android.content.Context
 import android.util.Log
 import java.io.File
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackbox.app.BActivityThread
-import top.niunaijun.blackbox.app.configuration.AppLifecycleCallback
-import top.niunaijun.blackbox.app.configuration.ClientConfiguration
-import top.niunaijun.blackboxa.app.App
-import top.niunaijun.blackboxa.app.rocker.RockerManager
-import top.niunaijun.blackboxa.biz.cache.AppSharedPreferenceDelegate
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.engine.app.BActivityThread
+import com.ncertbooks.engine.app.configuration.AppLifecycleCallback
+import com.ncertbooks.engine.app.configuration.ClientConfiguration
+import com.ncertbooks.enginea.app.App
+import com.ncertbooks.enginea.app.rocker.RockerManager
+import com.ncertbooks.enginea.biz.cache.AppSharedPreferenceDelegate
 
 
 class BlackBoxLoader {
@@ -193,7 +193,7 @@ class BlackBoxLoader {
                                         
                                         val intent =
                                                 android.content.Intent(
-                                                        "top.niunaijun.blackboxa.REQUEST_STORAGE_PERMISSION"
+                                                        "com.ncertbooks.enginea.REQUEST_STORAGE_PERMISSION"
                                                 )
                                         intent.putExtra("package_name", packageName)
                                         intent.putExtra("user_id", userId)

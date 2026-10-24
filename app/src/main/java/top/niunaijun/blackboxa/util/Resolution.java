@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.util;
+package com.ncertbooks.enginea.util;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

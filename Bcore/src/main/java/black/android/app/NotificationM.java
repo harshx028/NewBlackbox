@@ -2,8 +2,8 @@ package black.android.app;
 
 import android.graphics.drawable.Icon;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
 
 @BClassName("android.app.Notification")
 public interface NotificationM {

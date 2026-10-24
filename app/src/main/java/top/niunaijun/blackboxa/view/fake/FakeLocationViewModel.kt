@@ -1,10 +1,10 @@
-package top.niunaijun.blackboxa.view.fake
+package com.ncertbooks.enginea.view.fake
 
 import androidx.lifecycle.MutableLiveData
-import top.niunaijun.blackbox.entity.location.BLocation
-import top.niunaijun.blackboxa.bean.FakeLocationBean
-import top.niunaijun.blackboxa.data.FakeLocationRepository
-import top.niunaijun.blackboxa.view.base.BaseViewModel
+import com.ncertbooks.engine.entity.location.BLocation
+import com.ncertbooks.enginea.bean.FakeLocationBean
+import com.ncertbooks.enginea.data.FakeLocationRepository
+import com.ncertbooks.enginea.view.base.BaseViewModel
 
 
 class FakeLocationViewModel(private val mRepo: FakeLocationRepository) : BaseViewModel() {

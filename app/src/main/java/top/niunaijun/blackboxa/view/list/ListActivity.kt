@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.view.list
+package com.ncertbooks.enginea.view.list
 
 import android.app.Activity
 import android.content.Context
@@ -12,12 +12,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import cbfg.rvadapter.RVAdapter
 import com.ferfalk.simplesearchview.SimpleSearchView
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.InstalledAppBean
-import top.niunaijun.blackboxa.databinding.ActivityListBinding
-import top.niunaijun.blackboxa.util.InjectionUtil
-import top.niunaijun.blackboxa.util.inflate
-import top.niunaijun.blackboxa.view.base.BaseActivity
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.InstalledAppBean
+import com.ncertbooks.enginea.databinding.ActivityListBinding
+import com.ncertbooks.enginea.util.InjectionUtil
+import com.ncertbooks.enginea.util.inflate
+import com.ncertbooks.enginea.view.base.BaseActivity
 
 class ListActivity : BaseActivity() {
 

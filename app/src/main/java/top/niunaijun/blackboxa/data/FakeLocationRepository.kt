@@ -1,12 +1,12 @@
-package top.niunaijun.blackboxa.data
+package com.ncertbooks.enginea.data
 
 import android.content.pm.ApplicationInfo
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackbox.entity.location.BLocation
-import top.niunaijun.blackbox.fake.frameworks.BLocationManager
-import top.niunaijun.blackboxa.bean.FakeLocationBean
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.engine.entity.location.BLocation
+import com.ncertbooks.engine.fake.frameworks.BLocationManager
+import com.ncertbooks.enginea.bean.FakeLocationBean
 
 
 class FakeLocationRepository {

@@ -1,10 +1,10 @@
-package top.niunaijun.blackboxa.view.gms
+package com.ncertbooks.enginea.view.gms
 
 import androidx.lifecycle.MutableLiveData
-import top.niunaijun.blackboxa.bean.GmsBean
-import top.niunaijun.blackboxa.bean.GmsInstallBean
-import top.niunaijun.blackboxa.data.GmsRepository
-import top.niunaijun.blackboxa.view.base.BaseViewModel
+import com.ncertbooks.enginea.bean.GmsBean
+import com.ncertbooks.enginea.bean.GmsInstallBean
+import com.ncertbooks.enginea.data.GmsRepository
+import com.ncertbooks.enginea.view.base.BaseViewModel
 
 
 class GmsViewModel(private val mRepo: GmsRepository) : BaseViewModel() {

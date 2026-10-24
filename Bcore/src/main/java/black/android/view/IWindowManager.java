@@ -3,8 +3,8 @@ package black.android.view;
 import android.os.IBinder;
 import android.os.IInterface;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BStaticMethod;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BStaticMethod;
 
 @BClassName("android.view.IWindowManager")
 public interface IWindowManager {

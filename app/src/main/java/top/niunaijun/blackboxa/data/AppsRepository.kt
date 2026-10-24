@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.data
+package com.ncertbooks.enginea.data
 
 import android.content.pm.ApplicationInfo
 import android.net.Uri
@@ -6,14 +6,14 @@ import android.util.Log
 import android.webkit.URLUtil
 import androidx.lifecycle.MutableLiveData
 import java.io.File
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackbox.utils.AbiUtils
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.app.AppManager
-import top.niunaijun.blackboxa.bean.AppInfo
-import top.niunaijun.blackboxa.bean.InstalledAppBean
-import top.niunaijun.blackboxa.util.MemoryManager
-import top.niunaijun.blackboxa.util.getString
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.engine.utils.AbiUtils
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.app.AppManager
+import com.ncertbooks.enginea.bean.AppInfo
+import com.ncertbooks.enginea.bean.InstalledAppBean
+import com.ncertbooks.enginea.util.MemoryManager
+import com.ncertbooks.enginea.util.getString
 
 
 class AppsRepository {

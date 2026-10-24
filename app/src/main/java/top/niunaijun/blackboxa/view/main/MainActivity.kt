@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.view.main
+package com.ncertbooks.enginea.view.main
 
 import android.content.Context
 import android.content.Intent
@@ -13,18 +13,18 @@ import androidx.core.content.edit
 import androidx.viewpager2.widget.ViewPager2
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.app.App
-import top.niunaijun.blackboxa.app.AppManager
-import top.niunaijun.blackboxa.databinding.ActivityMainBinding
-import top.niunaijun.blackboxa.util.Resolution
-import top.niunaijun.blackboxa.util.inflate
-import top.niunaijun.blackboxa.view.apps.AppsFragment
-import top.niunaijun.blackboxa.view.base.LoadingActivity
-import top.niunaijun.blackboxa.view.fake.FakeManagerActivity
-import top.niunaijun.blackboxa.view.list.ListActivity
-import top.niunaijun.blackboxa.view.setting.SettingActivity
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.app.App
+import com.ncertbooks.enginea.app.AppManager
+import com.ncertbooks.enginea.databinding.ActivityMainBinding
+import com.ncertbooks.enginea.util.Resolution
+import com.ncertbooks.enginea.util.inflate
+import com.ncertbooks.enginea.view.apps.AppsFragment
+import com.ncertbooks.enginea.view.base.LoadingActivity
+import com.ncertbooks.enginea.view.fake.FakeManagerActivity
+import com.ncertbooks.enginea.view.list.ListActivity
+import com.ncertbooks.enginea.view.setting.SettingActivity
 
 class MainActivity : LoadingActivity() {
 

@@ -1,13 +1,13 @@
-package top.niunaijun.blackboxa.view.setting
+package com.ncertbooks.enginea.view.setting
 
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import top.niunaijun.blackbox.BlackBoxCore
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.app.AppManager
-import top.niunaijun.blackboxa.util.toast
-import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
+import com.ncertbooks.engine.BlackBoxCore
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.app.AppManager
+import com.ncertbooks.enginea.util.toast
+import com.ncertbooks.enginea.view.gms.GmsManagerActivity
 
 class SettingFragment : PreferenceFragmentCompat() {
 

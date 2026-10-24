@@ -1,9 +1,9 @@
-package top.niunaijun.blackboxa.view.apps
+package com.ncertbooks.enginea.view.apps
 
 import androidx.lifecycle.MutableLiveData
-import top.niunaijun.blackboxa.bean.AppInfo
-import top.niunaijun.blackboxa.data.AppsRepository
-import top.niunaijun.blackboxa.view.base.BaseViewModel
+import com.ncertbooks.enginea.bean.AppInfo
+import com.ncertbooks.enginea.data.AppsRepository
+import com.ncertbooks.enginea.view.base.BaseViewModel
 import android.util.Log
 
 

@@ -20,25 +20,25 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class top.niunaijun.blackbox.** {*; }
--keep class top.niunaijun.jnihook.** {*; }
+-keep class com.ncertbooks.engine.** {*; }
+-keep class com.ncertbooks.jni.** {*; }
 -keep class mirror.** {*; }
 -keep class android.** {*; }
 -keep class com.android.** {*; }
 
--keep class top.niunaijun.blackreflection.** {*; }
--keep @top.niunaijun.blackreflection.annotation.BClass class * {*;}
--keep @top.niunaijun.blackreflection.annotation.BClassName class * {*;}
--keep @top.niunaijun.blackreflection.annotation.BClassNameNotProcess class * {*;}
+-keep class com.ncertbooks.reflect.** {*; }
+-keep @com.ncertbooks.reflect.annotation.BClass class * {*;}
+-keep @com.ncertbooks.reflect.annotation.BClassName class * {*;}
+-keep @com.ncertbooks.reflect.annotation.BClassNameNotProcess class * {*;}
 -keepclasseswithmembernames class * {
-    @top.niunaijun.blackreflection.annotation.BField.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BFieldNotProcess.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BFieldSetNotProcess.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BFieldCheckNotProcess.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BMethod.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BStaticField.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BStaticMethod.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BMethodCheckNotProcess.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BConstructor.* <methods>;
-    @top.niunaijun.blackreflection.annotation.BConstructorNotProcess.* <methods>;
+    @com.ncertbooks.reflect.annotation.BField.* <methods>;
+    @com.ncertbooks.reflect.annotation.BFieldNotProcess.* <methods>;
+    @com.ncertbooks.reflect.annotation.BFieldSetNotProcess.* <methods>;
+    @com.ncertbooks.reflect.annotation.BFieldCheckNotProcess.* <methods>;
+    @com.ncertbooks.reflect.annotation.BMethod.* <methods>;
+    @com.ncertbooks.reflect.annotation.BStaticField.* <methods>;
+    @com.ncertbooks.reflect.annotation.BStaticMethod.* <methods>;
+    @com.ncertbooks.reflect.annotation.BMethodCheckNotProcess.* <methods>;
+    @com.ncertbooks.reflect.annotation.BConstructor.* <methods>;
+    @com.ncertbooks.reflect.annotation.BConstructorNotProcess.* <methods>;
 }

@@ -1,14 +1,14 @@
-package top.niunaijun.blackboxa.view.fake
+package com.ncertbooks.enginea.view.fake
 
 import android.view.View
 import android.view.ViewGroup
 import cbfg.rvadapter.RVHolder
 import cbfg.rvadapter.RVHolderFactory
-import top.niunaijun.blackbox.fake.frameworks.BLocationManager
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.FakeLocationBean
-import top.niunaijun.blackboxa.databinding.ItemFakeBinding
-import top.niunaijun.blackboxa.util.getString
+import com.ncertbooks.engine.fake.frameworks.BLocationManager
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.FakeLocationBean
+import com.ncertbooks.enginea.databinding.ItemFakeBinding
+import com.ncertbooks.enginea.util.getString
 
 
 

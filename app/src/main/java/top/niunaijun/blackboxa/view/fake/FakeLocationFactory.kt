@@ -1,8 +1,8 @@
-package top.niunaijun.blackboxa.view.fake
+package com.ncertbooks.enginea.view.fake
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import top.niunaijun.blackboxa.data.FakeLocationRepository
+import com.ncertbooks.enginea.data.FakeLocationRepository
 
 
 class FakeLocationFactory(private val repo: FakeLocationRepository) :

@@ -1,7 +1,7 @@
-package top.niunaijun.blackboxa.bean
+package com.ncertbooks.enginea.bean
 
 import android.graphics.drawable.Drawable
-import top.niunaijun.blackbox.entity.location.BLocation
+import com.ncertbooks.engine.entity.location.BLocation
 
 data class FakeLocationBean(
     val userID: Int,

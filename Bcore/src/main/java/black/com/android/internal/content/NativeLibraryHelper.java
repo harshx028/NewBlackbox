@@ -2,10 +2,10 @@ package black.com.android.internal.content;
 
 import java.io.File;
 
-import top.niunaijun.blackreflection.annotation.BClassName;
-import top.niunaijun.blackreflection.annotation.BField;
-import top.niunaijun.blackreflection.annotation.BParamClassName;
-import top.niunaijun.blackreflection.annotation.BStaticMethod;
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BField;
+import com.ncertbooks.reflect.annotation.BParamClassName;
+import com.ncertbooks.reflect.annotation.BStaticMethod;
 
 @BClassName("com.android.internal.content.NativeLibraryHelper")
 public interface NativeLibraryHelper {

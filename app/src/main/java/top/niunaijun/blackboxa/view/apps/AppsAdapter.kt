@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.view.apps
+package com.ncertbooks.enginea.view.apps
 
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import cbfg.rvadapter.RVHolder
 import cbfg.rvadapter.RVHolderFactory
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.AppInfo
-import top.niunaijun.blackboxa.databinding.ItemAppBinding
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.AppInfo
+import com.ncertbooks.enginea.databinding.ItemAppBinding
 import android.util.Log
 import android.graphics.Bitmap
 import android.graphics.Canvas

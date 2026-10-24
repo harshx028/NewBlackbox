@@ -1,12 +1,12 @@
-package top.niunaijun.blackboxa.view.list
+package com.ncertbooks.enginea.view.list
 
 import android.view.View
 import android.view.ViewGroup
 import cbfg.rvadapter.RVHolder
 import cbfg.rvadapter.RVHolderFactory
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.InstalledAppBean
-import top.niunaijun.blackboxa.databinding.ItemPackageBinding
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.InstalledAppBean
+import com.ncertbooks.enginea.databinding.ItemPackageBinding
 
 
 

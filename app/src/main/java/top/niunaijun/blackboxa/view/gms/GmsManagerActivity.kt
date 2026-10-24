@@ -1,4 +1,4 @@
-package top.niunaijun.blackboxa.view.gms
+package com.ncertbooks.enginea.view.gms
 
 import android.content.Context
 import android.content.Intent
@@ -8,13 +8,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import cbfg.rvadapter.RVAdapter
 import com.afollestad.materialdialogs.MaterialDialog
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.GmsBean
-import top.niunaijun.blackboxa.databinding.ActivityGmsBinding
-import top.niunaijun.blackboxa.util.InjectionUtil
-import top.niunaijun.blackboxa.util.inflate
-import top.niunaijun.blackboxa.util.toast
-import top.niunaijun.blackboxa.view.base.LoadingActivity
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.bean.GmsBean
+import com.ncertbooks.enginea.databinding.ActivityGmsBinding
+import com.ncertbooks.enginea.util.InjectionUtil
+import com.ncertbooks.enginea.util.inflate
+import com.ncertbooks.enginea.util.toast
+import com.ncertbooks.enginea.view.base.LoadingActivity
 
 
 class GmsManagerActivity : LoadingActivity() {

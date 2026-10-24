@@ -1,12 +1,12 @@
-package top.niunaijun.blackboxa.view.setting
+package com.ncertbooks.enginea.view.setting
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.databinding.ActivitySettingBinding
-import top.niunaijun.blackboxa.util.inflate
-import top.niunaijun.blackboxa.view.base.BaseActivity
+import com.ncertbooks.enginea.R
+import com.ncertbooks.enginea.databinding.ActivitySettingBinding
+import com.ncertbooks.enginea.util.inflate
+import com.ncertbooks.enginea.view.base.BaseActivity
 
 class SettingActivity : BaseActivity() {
 
