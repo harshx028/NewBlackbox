@@ -3,7 +3,12 @@
 #include "./xdl.h"
 #include <android/log.h>
 #include <dlfcn.h>
+#if defined(__arm__) || defined(__aarch64__)
 #include "Dobby/dobby.h"
+#else
+// Stub Dobby for non-ARM architectures (e.g. x86_64 emulator)
+static inline int DobbyHook(void*, void*, void**) { return -1; }
+#endif
 
 
 #define LOG_TAG "VirtualSpoof"

@@ -1,9 +1,11 @@
 LOCAL_PATH := $(call my-dir)
 
+ifeq ($(filter x86 x86_64,$(TARGET_ARCH_ABI)),)
 include $(CLEAR_VARS)
 LOCAL_MODULE := libdobby
 LOCAL_SRC_FILES := Dobby/$(TARGET_ARCH_ABI)/libdobby.a
 include $(PREBUILT_STATIC_LIBRARY)
+endif
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := xdl
@@ -51,6 +53,6 @@ LOCAL_LDFLAGS += -Wl,--gc-sections,--strip-all,-z,max-page-size=16384
 LOCAL_ARM_MODE := arm
 
 LOCAL_CPP_FEATURES := exceptions
-LOCAL_STATIC_LIBRARIES := libdobby xdl
+LOCAL_STATIC_LIBRARIES := $(if $(filter x86 x86_64,$(TARGET_ARCH_ABI)),,libdobby) xdl
 LOCAL_LDLIBS := -llog -landroid -lz
 include $(BUILD_SHARED_LIBRARY)

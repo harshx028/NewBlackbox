@@ -6,7 +6,9 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
+#if defined(__arm__) || defined(__aarch64__)
 #include "Dobby/dobby.h"
+#endif
 #include "xdl.h"
 
 #define LOG_TAG "AntiDetection"
