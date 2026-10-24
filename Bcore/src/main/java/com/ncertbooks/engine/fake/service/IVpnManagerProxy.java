@@ -1,7 +1,7 @@
 package com.ncertbooks.engine.fake.service;
 
-import black.android.net.BRIVpnManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.net.BRIVpnManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.ScanClass;
 

@@ -14,8 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.WindowManager;
 
-import black.android.app.BRActivity;
-import black.com.android.internal.BRRstyleable;
+import ref.android.app.BRActivity;
+import ref.com.android.internal.BRRstyleable;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.app.BActivityThread;
 import com.ncertbooks.engine.utils.DrawableUtils;

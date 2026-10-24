@@ -13,8 +13,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import black.android.net.BRIConnectivityManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.net.BRIConnectivityManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.ScanClass;
 import com.ncertbooks.engine.fake.hook.MethodHook;

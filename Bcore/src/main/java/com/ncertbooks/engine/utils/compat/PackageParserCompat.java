@@ -7,12 +7,12 @@ import android.util.DisplayMetrics;
 
 import java.io.File;
 
-import black.android.content.pm.BRPackageParser;
-import black.android.content.pm.BRPackageParserLollipop;
-import black.android.content.pm.BRPackageParserLollipop22;
-import black.android.content.pm.BRPackageParserMarshmallow;
-import black.android.content.pm.BRPackageParserNougat;
-import black.android.content.pm.BRPackageParserPie;
+import ref.android.content.pm.BRPackageParser;
+import ref.android.content.pm.BRPackageParserLollipop;
+import ref.android.content.pm.BRPackageParserLollipop22;
+import ref.android.content.pm.BRPackageParserMarshmallow;
+import ref.android.content.pm.BRPackageParserNougat;
+import ref.android.content.pm.BRPackageParserPie;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;

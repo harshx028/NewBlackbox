@@ -5,8 +5,8 @@ import android.content.pm.ApplicationInfo;
 
 import java.lang.reflect.Method;
 
-import black.android.os.BRServiceManager;
-import black.android.view.accessibility.BRIAccessibilityManagerStub;
+import ref.android.os.BRServiceManager;
+import ref.android.view.accessibility.BRIAccessibilityManagerStub;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.core.system.user.BUserHandle;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;

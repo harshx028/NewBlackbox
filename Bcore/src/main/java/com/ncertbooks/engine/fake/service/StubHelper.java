@@ -5,7 +5,7 @@ import android.util.Log;
 
 import java.lang.reflect.Method;
 
-import black.android.os.BRServiceManager;
+import ref.android.os.BRServiceManager;
 
 
 public class StubHelper {

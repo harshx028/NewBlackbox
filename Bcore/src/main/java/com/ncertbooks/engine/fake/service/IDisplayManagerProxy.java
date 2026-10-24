@@ -4,7 +4,7 @@ import android.os.IInterface;
 
 import java.lang.reflect.Method;
 
-import black.android.hardware.display.BRDisplayManagerGlobal;
+import ref.android.hardware.display.BRDisplayManagerGlobal;
 import com.ncertbooks.engine.fake.hook.ClassInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;
 import com.ncertbooks.engine.fake.hook.ProxyMethod;

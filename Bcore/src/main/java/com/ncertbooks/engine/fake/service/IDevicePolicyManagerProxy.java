@@ -5,8 +5,8 @@ import android.content.Context;
 
 import java.lang.reflect.Method;
 
-import black.android.app.admin.BRIDevicePolicyManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.app.admin.BRIDevicePolicyManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;
 import com.ncertbooks.engine.fake.hook.ProxyMethod;

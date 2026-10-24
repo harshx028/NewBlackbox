@@ -5,8 +5,8 @@ import android.os.IBinder;
 
 import java.lang.reflect.Method;
 
-import black.android.app.BRActivityClient;
-import black.android.util.BRSingleton;
+import ref.android.app.BRActivityClient;
+import ref.android.util.BRSingleton;
 import com.ncertbooks.engine.fake.frameworks.BActivityManager;
 import com.ncertbooks.engine.fake.hook.ClassInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;

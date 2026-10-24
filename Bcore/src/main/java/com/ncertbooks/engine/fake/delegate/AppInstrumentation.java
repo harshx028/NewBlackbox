@@ -12,8 +12,8 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 
-import black.android.app.BRActivity;
-import black.android.app.BRActivityThread;
+import ref.android.app.BRActivity;
+import ref.android.app.BRActivityThread;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.app.BActivityThread;
 import com.ncertbooks.engine.fake.hook.HookManager;

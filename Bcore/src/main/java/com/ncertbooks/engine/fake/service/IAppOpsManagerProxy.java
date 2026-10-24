@@ -6,9 +6,9 @@ import android.os.IBinder;
 
 import java.lang.reflect.Method;
 
-import black.android.app.BRAppOpsManager;
-import black.android.os.BRServiceManager;
-import black.com.android.internal.app.BRIAppOpsServiceStub;
+import ref.android.app.BRAppOpsManager;
+import ref.android.os.BRServiceManager;
+import ref.com.android.internal.app.BRIAppOpsServiceStub;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;

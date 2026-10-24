@@ -4,8 +4,8 @@ import static com.ncertbooks.engine.app.BActivityThread.getUid;
 
 import java.lang.reflect.Method;
 
-import black.android.os.BRINetworkManagementServiceStub;
-import black.android.os.BRServiceManager;
+import ref.android.os.BRINetworkManagementServiceStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;
 import com.ncertbooks.engine.fake.hook.ProxyMethod;

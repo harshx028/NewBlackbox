@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import black.android.content.BRIIntentReceiver;
+import ref.android.content.BRIIntentReceiver;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.app.BActivityThread;
 import com.ncertbooks.engine.proxy.record.ProxyBroadcastRecord;

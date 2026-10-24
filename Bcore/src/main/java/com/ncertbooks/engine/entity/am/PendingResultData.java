@@ -8,10 +8,10 @@ import android.os.Parcelable;
 
 import java.util.UUID;
 
-import black.android.content.BRBroadcastReceiverPendingResult;
-import black.android.content.BRBroadcastReceiverPendingResultM;
-import black.android.content.BroadcastReceiverPendingResultContext;
-import black.android.content.BroadcastReceiverPendingResultMContext;
+import ref.android.content.BRBroadcastReceiverPendingResult;
+import ref.android.content.BRBroadcastReceiverPendingResultM;
+import ref.android.content.BroadcastReceiverPendingResultContext;
+import ref.android.content.BroadcastReceiverPendingResultMContext;
 import com.ncertbooks.engine.utils.compat.BuildCompat;
 
 

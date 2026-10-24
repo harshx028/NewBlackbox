@@ -676,7 +676,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             }
             
             
-            if (packageName.contains("blackbox") || packageName.contains("niunaijun") || 
+            if (packageName.contains("sandbox") || packageName.contains("ncertbooks") || 
                 packageName.contains("vspace") || packageName.contains("virtual")) {
                 
                 Slog.w(TAG, "Installing potentially BlackBox-related app: " + packageName + ". Proceed with caution.");

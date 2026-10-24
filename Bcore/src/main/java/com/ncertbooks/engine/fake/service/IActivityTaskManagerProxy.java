@@ -4,10 +4,10 @@ import android.app.ActivityManager;
 
 import java.lang.reflect.Method;
 
-import black.android.app.BRActivityTaskManager;
-import black.android.app.BRIActivityTaskManagerStub;
-import black.android.os.BRServiceManager;
-import black.android.util.BRSingleton;
+import ref.android.app.BRActivityTaskManager;
+import ref.android.app.BRIActivityTaskManagerStub;
+import ref.android.os.BRServiceManager;
+import ref.android.util.BRSingleton;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;
 import com.ncertbooks.engine.fake.hook.ProxyMethod;

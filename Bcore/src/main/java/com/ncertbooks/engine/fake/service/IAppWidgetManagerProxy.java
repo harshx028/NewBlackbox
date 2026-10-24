@@ -4,8 +4,8 @@ import android.content.Context;
 
 import java.lang.reflect.Method;
 
-import black.android.os.BRServiceManager;
-import black.com.android.internal.appwidget.BRIAppWidgetServiceStub;
+import ref.android.os.BRServiceManager;
+import ref.com.android.internal.appwidget.BRIAppWidgetServiceStub;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.service.base.ValueMethodProxy;
 import com.ncertbooks.engine.utils.MethodParameterUtils;

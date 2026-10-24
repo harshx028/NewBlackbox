@@ -8,8 +8,8 @@ import android.os.Bundle;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import black.android.accounts.BRIAccountManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.accounts.BRIAccountManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.frameworks.BAccountManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;

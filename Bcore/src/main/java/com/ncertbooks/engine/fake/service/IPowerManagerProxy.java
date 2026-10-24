@@ -2,8 +2,8 @@ package com.ncertbooks.engine.fake.service;
 
 import android.content.Context;
 
-import black.android.os.BRIPowerManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.os.BRIPowerManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.service.base.ValueMethodProxy;
 

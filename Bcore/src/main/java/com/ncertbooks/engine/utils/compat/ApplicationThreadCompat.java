@@ -3,8 +3,8 @@ package com.ncertbooks.engine.utils.compat;
 import android.os.IBinder;
 import android.os.IInterface;
 
-import black.android.app.BRApplicationThreadNative;
-import black.android.app.BRIApplicationThreadOreoStub;
+import ref.android.app.BRApplicationThreadNative;
+import ref.android.app.BRIApplicationThreadOreoStub;
 
 public class ApplicationThreadCompat {
 

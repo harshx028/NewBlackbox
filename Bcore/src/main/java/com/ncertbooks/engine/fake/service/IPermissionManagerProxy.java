@@ -2,10 +2,10 @@ package com.ncertbooks.engine.fake.service;
 
 import android.content.pm.PackageManager;
 
-import black.android.app.BRActivityThread;
-import black.android.app.BRContextImpl;
-import black.android.os.BRServiceManager;
-import black.android.permission.BRIPermissionManagerStub;
+import ref.android.app.BRActivityThread;
+import ref.android.app.BRContextImpl;
+import ref.android.os.BRServiceManager;
+import ref.android.permission.BRIPermissionManagerStub;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.service.base.PkgMethodProxy;

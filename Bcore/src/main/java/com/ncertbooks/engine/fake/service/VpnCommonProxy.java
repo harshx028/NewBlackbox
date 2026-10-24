@@ -3,8 +3,8 @@ package com.ncertbooks.engine.fake.service;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import black.com.android.internal.net.BRVpnConfig;
-import black.com.android.internal.net.VpnConfigContext;
+import ref.com.android.internal.net.BRVpnConfig;
+import ref.com.android.internal.net.VpnConfigContext;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.app.BActivityThread;
 import com.ncertbooks.engine.fake.hook.MethodHook;

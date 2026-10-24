@@ -2,8 +2,8 @@ package com.ncertbooks.engine.core.env;
 
 import android.content.pm.ApplicationInfo;
 
-import black.android.ddm.BRDdmHandleAppName;
-import black.android.os.BRProcess;
+import ref.android.ddm.BRDdmHandleAppName;
+import ref.android.os.BRProcess;
 
 public class VirtualRuntime {
 

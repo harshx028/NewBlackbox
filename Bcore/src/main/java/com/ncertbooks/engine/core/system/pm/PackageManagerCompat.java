@@ -20,11 +20,11 @@ import android.os.Build;
 import java.util.HashSet;
 import java.util.Set;
 
-import black.android.content.pm.BRApplicationInfoL;
-import black.android.content.pm.BRApplicationInfoN;
-import black.android.content.pm.BRPackageParserSigningDetails;
-import black.android.content.pm.BRSigningInfo;
-import black.android.content.res.BRAssetManager;
+import ref.android.content.pm.BRApplicationInfoL;
+import ref.android.content.pm.BRApplicationInfoN;
+import ref.android.content.pm.BRPackageParserSigningDetails;
+import ref.android.content.pm.BRSigningInfo;
+import ref.android.content.res.BRAssetManager;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.core.env.AppSystemEnv;
 import com.ncertbooks.engine.core.env.BEnvironment;

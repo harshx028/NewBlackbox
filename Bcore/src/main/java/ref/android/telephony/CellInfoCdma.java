@@ -1,0 +1,20 @@
+package ref.android.telephony;
+
+import android.telephony.CellIdentityCdma;
+import android.telephony.CellSignalStrengthCdma;
+
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BConstructor;
+import com.ncertbooks.reflect.annotation.BField;
+
+@BClassName("android.telephony.CellInfoCdma")
+public interface CellInfoCdma {
+    @BConstructor
+    CellInfoCdma _new();
+
+    @BField
+    CellIdentityCdma mCellIdentityCdma();
+
+    @BField
+    CellSignalStrengthCdma mCellSignalStrengthCdma();
+}

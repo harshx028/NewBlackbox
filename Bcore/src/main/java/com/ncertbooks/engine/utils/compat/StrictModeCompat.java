@@ -1,6 +1,6 @@
 package com.ncertbooks.engine.utils.compat;
 
-import black.android.os.BRStrictMode;
+import ref.android.os.BRStrictMode;
 
 public class StrictModeCompat {
     public static int DETECT_VM_FILE_URI_EXPOSURE = BRStrictMode.get().DETECT_VM_FILE_URI_EXPOSURE() == null ?

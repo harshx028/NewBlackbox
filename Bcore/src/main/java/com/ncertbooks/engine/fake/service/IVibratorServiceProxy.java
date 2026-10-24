@@ -5,9 +5,9 @@ import android.os.IBinder;
 
 import java.lang.reflect.Method;
 
-import black.android.os.BRIVibratorManagerServiceStub;
-import black.android.os.BRServiceManager;
-import black.com.android.internal.os.BRIVibratorServiceStub;
+import ref.android.os.BRIVibratorManagerServiceStub;
+import ref.android.os.BRServiceManager;
+import ref.com.android.internal.os.BRIVibratorServiceStub;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.utils.MethodParameterUtils;
 import com.ncertbooks.engine.utils.compat.BuildCompat;

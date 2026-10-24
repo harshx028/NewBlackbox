@@ -1,0 +1,24 @@
+package ref.android.telephony;
+
+
+import com.ncertbooks.reflect.annotation.BClassName;
+import com.ncertbooks.reflect.annotation.BConstructor;
+import com.ncertbooks.reflect.annotation.BField;
+
+@BClassName("android.telephony.CellIdentityGsm")
+public interface CellIdentityGsm {
+    @BConstructor
+    CellIdentityGsm _new();
+
+    @BField
+    int mCid();
+
+    @BField
+    int mLac();
+
+    @BField
+    int mMcc();
+
+    @BField
+    int mMnc();
+}

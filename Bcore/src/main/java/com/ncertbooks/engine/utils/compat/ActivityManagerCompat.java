@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import black.android.app.BRActivity;
-import black.android.app.BRActivityManagerNative;
-import black.android.app.BRIActivityManager;
-import black.android.app.BRIActivityManagerL;
-import black.android.app.BRIActivityManagerN;
+import ref.android.app.BRActivity;
+import ref.android.app.BRActivityManagerNative;
+import ref.android.app.BRIActivityManager;
+import ref.android.app.BRIActivityManagerL;
+import ref.android.app.BRIActivityManagerN;
 
 public class ActivityManagerCompat {
 	

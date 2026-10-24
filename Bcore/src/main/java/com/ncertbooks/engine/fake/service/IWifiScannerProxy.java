@@ -3,8 +3,8 @@ package com.ncertbooks.engine.fake.service;
 import android.content.Context;
 import android.os.IBinder;
 
-import black.android.net.wifi.BRIWifiManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.net.wifi.BRIWifiManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 
 

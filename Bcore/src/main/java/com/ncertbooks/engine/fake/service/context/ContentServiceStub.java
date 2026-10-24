@@ -2,8 +2,8 @@ package com.ncertbooks.engine.fake.service.context;
 
 import java.lang.reflect.Method;
 
-import black.android.content.BRIContentServiceStub;
-import black.android.os.BRServiceManager;
+import ref.android.content.BRIContentServiceStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;
 import com.ncertbooks.engine.fake.hook.ProxyMethod;

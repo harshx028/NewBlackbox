@@ -4,8 +4,8 @@ import android.content.Context;
 
 import java.lang.reflect.Method;
 
-import black.android.media.session.BRISessionManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.media.session.BRISessionManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;

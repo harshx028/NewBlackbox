@@ -7,8 +7,8 @@ import android.content.pm.ShortcutInfo;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import black.android.content.pm.BRIShortcutServiceStub;
-import black.android.os.BRServiceManager;
+import ref.android.content.pm.BRIShortcutServiceStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;
 import com.ncertbooks.engine.fake.hook.ProxyMethod;

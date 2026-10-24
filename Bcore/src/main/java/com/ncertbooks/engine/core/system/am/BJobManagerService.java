@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import black.android.app.job.BRJobInfo;
+import ref.android.app.job.BRJobInfo;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.core.system.BProcessManagerService;
 import com.ncertbooks.engine.core.system.ISystemService;

@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import java.io.FileDescriptor;
 import java.util.Map;
 
-import black.android.os.BRServiceManager;
+import ref.android.os.BRServiceManager;
 
 
 public abstract class BinderInvocationStub extends ClassInvocationStub implements IBinder {

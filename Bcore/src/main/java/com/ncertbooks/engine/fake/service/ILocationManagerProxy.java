@@ -9,11 +9,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
 
-import black.android.location.BRILocationListener;
-import black.android.location.BRILocationManagerStub;
-import black.android.location.provider.BRProviderProperties;
-import black.android.location.provider.ProviderProperties;
-import black.android.os.BRServiceManager;
+import ref.android.location.BRILocationListener;
+import ref.android.location.BRILocationManagerStub;
+import ref.android.location.provider.BRProviderProperties;
+import ref.android.location.provider.ProviderProperties;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.app.BActivityThread;
 import com.ncertbooks.engine.entity.location.BLocation;
 import com.ncertbooks.engine.fake.frameworks.BLocationManager;

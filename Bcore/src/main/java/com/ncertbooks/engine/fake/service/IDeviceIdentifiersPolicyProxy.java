@@ -3,8 +3,8 @@ package com.ncertbooks.engine.fake.service;
 
 import java.lang.reflect.Method;
 
-import black.android.os.BRIDeviceIdentifiersPolicyServiceStub;
-import black.android.os.BRServiceManager;
+import ref.android.os.BRIDeviceIdentifiersPolicyServiceStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
 import com.ncertbooks.engine.fake.hook.MethodHook;

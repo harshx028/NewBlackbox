@@ -72,8 +72,6 @@ void install_property_get_hook() {
 }
 
 
-__attribute__((constructor)) void init_virtual_spoof()
-{
-    install_property_get_hook();
-    LOGD("VirtualSpoof: __system_property_get hook loaded");
+__attribute__((constructor)) void init_virtual_spoof() {
+    // hooks disabled
 }

@@ -5,9 +5,9 @@ import android.content.Context;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import black.android.content.pm.BRUserInfo;
-import black.android.os.BRIUserManagerStub;
-import black.android.os.BRServiceManager;
+import ref.android.content.pm.BRUserInfo;
+import ref.android.os.BRIUserManagerStub;
+import ref.android.os.BRServiceManager;
 import com.ncertbooks.engine.BlackBoxCore;
 import com.ncertbooks.engine.app.BActivityThread;
 import com.ncertbooks.engine.fake.hook.BinderInvocationStub;
