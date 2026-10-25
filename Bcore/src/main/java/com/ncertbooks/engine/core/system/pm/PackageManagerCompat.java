@@ -17,6 +17,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Build;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import com.ncertbooks.engine.core.env.BEnvironment;
 import com.ncertbooks.engine.entity.pm.InstallOption;
 import com.ncertbooks.engine.utils.ArrayUtils;
 import com.ncertbooks.engine.utils.FileUtils;
+import com.ncertbooks.engine.utils.Slog;
 import com.ncertbooks.engine.utils.compat.BuildCompat;
 
 
@@ -346,22 +348,51 @@ public class PackageManagerCompat {
     private static void fixJar(ApplicationInfo info) {
         String APACHE_LEGACY_JAR = "/system/framework/org.apache.http.legacy.boot.jar";
         String APACHE_LEGACY_JAR_Q = "/system/framework/org.apache.http.legacy.jar";
-        Set<String> sharedLibraryFileList = new HashSet<>();
-        if (BuildCompat.isQ()) {
-            if (!FileUtils.isExist(APACHE_LEGACY_JAR_Q)) {
-                sharedLibraryFileList.add(APACHE_LEGACY_JAR);
-            } else {
-                sharedLibraryFileList.add(APACHE_LEGACY_JAR_Q);
-            }
-        } else {
-            sharedLibraryFileList.add(APACHE_LEGACY_JAR);
+        String jarPath = APACHE_LEGACY_JAR;
+        if (BuildCompat.isQ() && FileUtils.isExist(APACHE_LEGACY_JAR_Q)) {
+            jarPath = APACHE_LEGACY_JAR_Q;
         }
 
-
-
-
-
+        Set<String> sharedLibraryFileList = new HashSet<>();
+        // Android 12+ silently skips sharedLibraryFiles entries that don't end in .apk
+        // (LoadedApk.makePaths). The legacy jar is a dex container, so expose it through an
+        // .apk alias that the framework will accept as a classpath entry.
+        File legacyApk = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            legacyApk = ensureLegacyJarApk(jarPath);
+        }
+        if (legacyApk != null) {
+            sharedLibraryFileList.add(legacyApk.getAbsolutePath());
+        } else {
+            sharedLibraryFileList.add(jarPath);
+        }
         info.sharedLibraryFiles = sharedLibraryFileList.toArray(new String[]{});
+    }
+
+    private static File ensureLegacyJarApk(String jarPath) {
+        File source = new File(jarPath);
+        if (!source.isFile()) {
+            return null;
+        }
+        try {
+            File dir = new File(BEnvironment.getCacheDir(), "shared-libs");
+            FileUtils.mkdirs(dir);
+            File target = new File(dir, "org.apache.http.legacy.apk");
+            if (target.isFile() && target.length() == source.length()) {
+                return target;
+            }
+
+            File temp = new File(dir, target.getName() + "." + android.os.Process.myPid() + ".tmp");
+            FileUtils.copyFile(source, temp);
+            if (temp.renameTo(target)) {
+                return target;
+            }
+            temp.delete();
+            return target.isFile() && target.length() == source.length() ? target : null;
+        } catch (Throwable e) {
+            Slog.w("PackageManagerCompat", "Unable to expose Apache legacy jar: " + e.getMessage());
+            return null;
+        }
     }
 
     public static Resources getResources(Context context, ApplicationInfo appInfo) {
