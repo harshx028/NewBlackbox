@@ -80,7 +80,10 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (!TextUtils.isEmpty(action)) {
-                if ("android.intent.action.PACKAGE_ADDED".equals(action) || "android.intent.action.PACKAGE_REMOVED".equals(action)) {
+                if ("android.intent.action.PACKAGE_ADDED".equals(action)) {
+                    // Rescan on install/update so FLAG_SYSTEM clones pick up the new APK path.
+                    // Do NOT rescan on PACKAGE_REMOVED — the original being uninstalled must not
+                    // affect the independent cloned copy inside the virtual engine.
                     mSettings.scanPackage();
                 }
             }

@@ -206,10 +206,18 @@ import com.ncertbooks.engine.utils.compat.PackageParserCompat;
             BPackageSettings bPackageSettings = new BPackageSettings(packageSettingsIn);
             bPackageSettings.pkg.mExtras = bPackageSettings;
             if (bPackageSettings.installOption.isFlag(InstallOption.FLAG_SYSTEM)) {
-                PackageInfo packageInfo = BlackBoxCore.getPackageManager().getPackageInfo(packageName, PackageManager.GET_META_DATA);
+                PackageInfo packageInfo;
+                try {
+                    packageInfo = BlackBoxCore.getPackageManager().getPackageInfo(packageName, PackageManager.GET_META_DATA);
+                } catch (PackageManager.NameNotFoundException e) {
+                    // Original app was uninstalled from the device. The clone lives independently
+                    // in the virtual engine — keep its stored data and do not delete it.
+                    Slog.d(TAG, "original uninstalled, keeping virtual clone: " + packageName);
+                    mPackages.put(bPackageSettings.pkg.packageName, bPackageSettings);
+                    return;
+                }
                 String currPackageSourcePath = packageInfo.applicationInfo.sourceDir;
                 if (!currPackageSourcePath.equals(bPackageSettings.pkg.baseCodePath)) {
-                    
                     BProcessManagerService.get().killAllByPackageName(bPackageSettings.pkg.packageName);
                     BPackageSettings newPkg = reInstallBySystem(packageInfo, bPackageSettings.installOption);
                     bPackageSettings.pkg = newPkg.pkg;
