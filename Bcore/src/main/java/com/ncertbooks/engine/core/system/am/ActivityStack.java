@@ -282,8 +282,10 @@ public class ActivityStack {
         Intent shadow = startActivityProcess(userId, intent, activityInfo, record);
 
         shadow.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        shadow.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shadow.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS prevents virtual app tasks from showing
+        // in the system recents/overview screen — only the host app should appear there.
+        shadow.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         shadow.addFlags(launchMode);
 
         BlackBoxCore.getContext().startActivity(shadow);

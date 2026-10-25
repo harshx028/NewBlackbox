@@ -553,6 +553,7 @@
             android:process=":p0"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P1"
@@ -561,6 +562,7 @@
             android:process=":p1"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P2"
@@ -569,6 +571,7 @@
             android:process=":p2"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P3"
@@ -577,6 +580,7 @@
             android:process=":p3"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P4"
@@ -585,6 +589,7 @@
             android:process=":p4"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P5"
@@ -593,6 +598,7 @@
             android:process=":p5"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P6"
@@ -601,6 +607,7 @@
             android:process=":p6"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P7"
@@ -609,6 +616,7 @@
             android:process=":p7"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P8"
@@ -617,6 +625,7 @@
             android:process=":p8"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
         <activity
             android:name=".proxy.ProxyActivity$P9"
@@ -625,6 +634,7 @@
             android:process=":p9"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@style/BTheme" />
 
 
@@ -635,6 +645,7 @@
             android:process=":p0"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P1"
@@ -643,6 +654,7 @@
             android:process=":p1"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P2"
@@ -651,6 +663,7 @@
             android:process=":p2"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P3"
@@ -659,6 +672,7 @@
             android:process=":p3"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P4"
@@ -667,6 +681,7 @@
             android:process=":p4"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P5"
@@ -675,6 +690,7 @@
             android:process=":p5"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P6"
@@ -683,6 +699,7 @@
             android:process=":p6"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P7"
@@ -691,6 +708,7 @@
             android:process=":p7"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P8"
@@ -699,6 +717,7 @@
             android:process=":p8"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.TransparentProxyActivity$P9"
@@ -707,6 +726,7 @@
             android:process=":p9"
             android:supportsPictureInPicture="true"
             android:taskAffinity="com.ncertbooks.task"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
 
 
@@ -714,51 +734,61 @@
             android:name=".proxy.ProxyPendingActivity$P0"
             android:exported="true"
             android:process=":p0"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P1"
             android:exported="true"
             android:process=":p1"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P2"
             android:exported="true"
             android:process=":p2"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P3"
             android:exported="true"
             android:process=":p3"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P4"
             android:exported="true"
             android:process=":p4"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P5"
             android:exported="true"
             android:process=":p5"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P6"
             android:exported="true"
             android:process=":p6"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P7"
             android:exported="true"
             android:process=":p7"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P8"
             android:exported="true"
             android:process=":p8"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P9"
             android:exported="true"
             android:process=":p9"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
 
         <service
