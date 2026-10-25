@@ -6,22 +6,23 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import dalvik.system.DexClassLoader;
+import dalvik.system.InMemoryDexClassLoader;
 import ref.android.app.BRActivity;
 import ref.android.app.BRActivityThread;
 import com.ncertbooks.engine.BlackBoxCore;
@@ -44,7 +45,9 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
     // Cached combined ClassLoader built from Helium asset-embedded DEX files.
     // Helium splits (e.g. split_heliumcore.apk) do NOT have classes.dex at root;
     // they store it at assets/<splitname>/classes.dex. Standard DexPathList can't
-    // find them, so we extract and load them manually on first miss.
+    // find them, so we load them into memory via InMemoryDexClassLoader (API 26+).
+    // Android 10+ also blocks DexClassLoader from writable paths, making in-memory
+    // loading the only viable approach.
     private static volatile ClassLoader sHeliumLoader;
     private static final Object sHeliumLock = new Object();
 
@@ -182,8 +185,10 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
                 } catch (Exception ignored) {
                     Log.w(TAG, "Direct ClassLoader fallback failed for " + className);
                 }
-                // Helium fallback: extract asset-embedded DEX from split APKs and load from there.
+                // Helium fallback: load asset-embedded DEX from split APKs into memory.
                 // Instagram's Helium stores classes at assets/<splitname>/classes.dex, not root.
+                // Android 10+ blocks DexClassLoader from writable paths, so we use
+                // InMemoryDexClassLoader to avoid writing to disk entirely.
                 Activity heliumActivity = tryLoadFromHeliumAssets(cl, className);
                 if (heliumActivity != null) {
                     return heliumActivity;
@@ -194,6 +199,9 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
     }
 
     private Activity tryLoadFromHeliumAssets(ClassLoader cl, String className) {
+        // InMemoryDexClassLoader requires API 26+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return null;
+
         // Fast path: use already-built combined Helium loader
         if (sHeliumLoader != null) {
             try {
@@ -209,15 +217,7 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
             }
 
             try {
-                Context hostCtx = BlackBoxCore.getContext();
-                if (hostCtx == null) return null;
-
-                File heliumDir = new File(hostCtx.getCacheDir(), "helium_dex");
-                if (!heliumDir.exists()) heliumDir.mkdirs();
-
-                // Get split APK paths from the virtual app's ApplicationInfo.
-                // In p0 these point to the real installed APK on device.
-                List<String> extractedDexPaths = new ArrayList<>();
+                List<ByteBuffer> dexBuffers = new ArrayList<>();
                 List<File> splitApks = getSplitApksFromClassLoader(cl);
 
                 for (File splitApk : splitApks) {
@@ -231,42 +231,39 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
                         ZipEntry entry = zip.getEntry(assetEntry);
                         if (entry == null) continue; // not a Helium-style split
 
-                        File outDex = new File(heliumDir, splitName + ".dex");
-                        // Extract DEX bytes
-                        try (InputStream in = zip.getInputStream(entry);
-                             FileOutputStream out = new FileOutputStream(outDex)) {
-                            byte[] buf = new byte[8192];
-                            int n;
-                            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-                        }
-                        extractedDexPaths.add(outDex.getAbsolutePath());
-                        Log.d(TAG, "Helium DEX extracted: " + assetEntry + " → " + outDex.getName());
-                    } catch (Exception e) {
-                        Log.w(TAG, "Could not extract Helium DEX from " + apkName + ": " + e.getMessage());
+                        byte[] bytes = readAllBytes(zip.getInputStream(entry));
+                        dexBuffers.add(ByteBuffer.wrap(bytes));
+                        Log.d(TAG, "Helium DEX loaded: " + assetEntry + " (" + bytes.length + " bytes)");
+                    } catch (IOException e) {
+                        Log.w(TAG, "Could not read Helium DEX from " + apkName + ": " + e.getMessage());
                     }
                 }
 
-                if (extractedDexPaths.isEmpty()) return null;
+                if (dexBuffers.isEmpty()) return null;
 
-                StringBuilder sb = new StringBuilder();
-                for (String p : extractedDexPaths) {
-                    if (sb.length() > 0) sb.append(File.pathSeparator);
-                    sb.append(p);
-                }
-
-                sHeliumLoader = new DexClassLoader(sb.toString(), heliumDir.getAbsolutePath(), null, cl);
-                Log.d(TAG, "Helium ClassLoader built with " + extractedDexPaths.size() + " DEX(es)");
+                ByteBuffer[] buffers = dexBuffers.toArray(new ByteBuffer[0]);
+                sHeliumLoader = new InMemoryDexClassLoader(buffers, cl);
+                Log.d(TAG, "InMemoryDexClassLoader built with " + buffers.length + " Helium DEX(es)");
 
                 try {
                     return instantiateActivity(sHeliumLoader, className);
                 } catch (Exception e) {
-                    Log.w(TAG, "Helium loader still can't find: " + className);
+                    Log.w(TAG, "Helium InMemoryDexClassLoader can't find: " + className);
                     return null;
                 }
             } catch (Exception e) {
                 Log.w(TAG, "tryLoadFromHeliumAssets error: " + e.getMessage());
                 return null;
             }
+        }
+    }
+
+    private byte[] readAllBytes(InputStream is) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = is.read(buf)) > 0) baos.write(buf, 0, n);
+            return baos.toByteArray();
         }
     }
 
@@ -278,7 +275,7 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
     private List<File> getSplitApksFromClassLoader(ClassLoader cl) {
         List<File> result = new ArrayList<>();
         try {
-            // BaseDexClassLoader.pathList → DexPathList.dexElements → Element.path
+            // BaseDexClassLoader.pathList -> DexPathList.dexElements -> Element.path
             Class<?> bdcl = Class.forName("dalvik.system.BaseDexClassLoader");
             Field pathListField = bdcl.getDeclaredField("pathList");
             pathListField.setAccessible(true);
