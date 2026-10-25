@@ -29,9 +29,13 @@ public class AppSystemEnv {
 
         
         sSystemPackages.add("com.google.android.inputmethod.latin");
-        
 
-        
+        // Google Play Services and framework — virtual apps query these as system services.
+        // Passing them through to the real PM lets GMS availability checks succeed.
+        sSystemPackages.add("com.google.android.gms");
+        sSystemPackages.add("com.google.android.gsf");
+        sSystemPackages.add("com.android.vending");
+
         sSystemPackages.add("com.huawei.webview");
 
         
