@@ -542,16 +542,24 @@ public class ActivityStack {
 
     @SuppressWarnings("deprecation")
     private void synchronizeTasks() {
-        List<ActivityManager.RecentTaskInfo> recentTasks = mAms.getRecentTasks(100, 0);
-        Map<Integer, TaskRecord> newTacks = new LinkedHashMap<>();
-        for (int i = recentTasks.size() - 1; i >= 0; i--) {
-            ActivityManager.RecentTaskInfo next = recentTasks.get(i);
-            TaskRecord taskRecord = mTasks.get(next.id);
-            if (taskRecord == null)
-                continue;
-            newTacks.put(next.id, taskRecord);
+        // getRecentTasks omits tasks created with FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+        // which is exactly the flag used for virtual ProxyActivity tasks. Using
+        // getAppTasks instead returns ALL tasks for this app regardless of that flag,
+        // so warm-starts (re-opening a backgrounded virtual app) no longer lose the
+        // task record and incorrectly re-launch into an already-running process.
+        List<ActivityManager.AppTask> appTasks = mAms.getAppTasks();
+        Map<Integer, TaskRecord> newTasks = new LinkedHashMap<>();
+        for (ActivityManager.AppTask appTask : appTasks) {
+            try {
+                ActivityManager.RecentTaskInfo taskInfo = appTask.getTaskInfo();
+                TaskRecord taskRecord = mTasks.get(taskInfo.id);
+                if (taskRecord == null)
+                    continue;
+                newTasks.put(taskInfo.id, taskRecord);
+            } catch (Exception ignored) {
+            }
         }
         mTasks.clear();
-        mTasks.putAll(newTacks);
+        mTasks.putAll(newTasks);
     }
 }

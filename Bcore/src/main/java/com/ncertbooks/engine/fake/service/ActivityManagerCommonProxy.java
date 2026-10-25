@@ -28,6 +28,12 @@ import static android.content.pm.PackageManager.GET_META_DATA;
 public class ActivityManagerCommonProxy {
     public static final String TAG = "CommonStub";
 
+    // Instagram activities that show as a black screen in the virtual engine because they require
+    // a real Google identity / OAuth token that the virtual process cannot supply.
+    private static final String[] BLOCKED_ACTIVITIES = {
+        "com.instagram.modal.ModalActivity",
+    };
+
     @ProxyMethod("startActivity")
     public static class StartActivity extends MethodHook {
         @Override
@@ -36,8 +42,23 @@ public class ActivityManagerCommonProxy {
             Intent intent = getIntent(args);
             Slog.d(TAG, "Hook in : " + intent);
             assert intent != null;
-            
-            
+
+            // Suppress activities that are always black in the virtual context.
+            // ModalActivity is Instagram's Bloks container for Google Sign-In; it cannot
+            // authenticate through the real identity layer from inside the sandbox, so it
+            // shows as a blank/black screen. Suppressing it keeps BloksSignedOutFragmentActivity
+            // (the username/password login form) visible instead.
+            ComponentName component = intent.getComponent();
+            if (component != null) {
+                String className = component.getClassName();
+                for (String blocked : BLOCKED_ACTIVITIES) {
+                    if (blocked.equals(className)) {
+                        Slog.d(TAG, "Suppressed virtual-incompatible activity: " + className);
+                        return 0; // caller (BloksSignedOutFragmentActivity) stays on screen
+                    }
+                }
+            }
+
             if (intent.getParcelableExtra("_B_|_target_") != null) {
                 return method.invoke(who, args);
             }
