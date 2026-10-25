@@ -281,10 +281,12 @@ public class ActivityStack {
         ActivityRecord record = newActivityRecord(intent, activityInfo, resultTo, userId);
         Intent shadow = startActivityProcess(userId, intent, activityInfo, record);
 
+        // NEW_DOCUMENT + MULTIPLE_TASK + NEW_TASK creates a proper isolated task per virtual app.
+        // MULTIPLE_TASK is only valid paired with NEW_DOCUMENT — do not remove NEW_DOCUMENT.
+        shadow.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shadow.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         shadow.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        // FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS prevents virtual app tasks from showing
-        // in the system recents/overview screen — only the host app should appear there.
+        // Exclude the virtual app's task from the system recents/overview screen.
         shadow.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         shadow.addFlags(launchMode);
 
