@@ -84,28 +84,11 @@ public class BlackBoxCore extends ClientConfiguration {
     
     
     static {
-        try {
-            
-            SimpleCrashFix.installSimpleFix();
-            Slog.d(TAG, "Simple crash fix installed at class loading time");
-            
-            StackTraceFilter.install();
-            Slog.d(TAG, "Stack trace filter installed at class loading time");
-            
-            SocialMediaAppCrashPrevention.initialize();
-            Slog.d(TAG, "Social media app crash prevention initialized at class loading time");
-            
-            DexCrashPrevention.initialize();
-            Slog.d(TAG, "DEX crash prevention initialized at class loading time");
-            
-            NativeCrashPrevention.initialize();
-            Slog.d(TAG, "Native crash prevention initialized at class loading time");
-            
-            CrashMonitor.initialize();
-            Slog.d(TAG, "Comprehensive crash monitoring initialized at class loading time");
-        } catch (Exception e) {
-            Slog.w(TAG, "Failed to install simple crash fix or stack trace filter at class loading: " + e.getMessage());
-        }
+        // Intentionally empty — do NOT install any UncaughtExceptionHandler here.
+        // BlackBoxCore's static initializer runs in every process that loads it, including
+        // the virtual-app process (p0). Installing custom crash handlers in p0 intercepts
+        // the guest app's (e.g. Instagram's) own crash chain and causes appstatelogger2 /
+        // CatchMeIfYouCan to behave unexpectedly, ultimately killing p0 with SIGKILL.
     }
     private ProcessType mProcessType;
     private final Map<String, IBinder> mServices = new HashMap<>();

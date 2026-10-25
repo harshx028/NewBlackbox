@@ -193,6 +193,22 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
                 if (heliumActivity != null) {
                     return heliumActivity;
                 }
+                // InternalLauncher is a Helium virtual class — not present in any real DEX.
+                // Helium maps it at runtime via a custom ClassLoader that only exists after
+                // Application.onCreate(). When p0 restarts with InternalLauncher as the top
+                // activity (after a prior crash), redirect to the real sign-in screen so the
+                // process can initialize cleanly instead of crash-looping.
+                if (className.contains("InternalLauncher")) {
+                    Log.d(TAG, "InternalLauncher redirect → BloksSignedOutFragmentActivity");
+                    try {
+                        return super.newActivity(cl, "com.instagram.nux.activity.BloksSignedOutFragmentActivity", intent);
+                    } catch (Exception ignored) {
+                        Log.w(TAG, "BloksSignedOutFragmentActivity redirect failed, trying MainTabActivity");
+                        try {
+                            return super.newActivity(cl, "com.instagram.mainactivity.MainTabActivity", intent);
+                        } catch (Exception ignored2) {}
+                    }
+                }
                 throw new ClassNotFoundException(className, e2);
             }
         }
