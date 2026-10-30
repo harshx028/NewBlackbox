@@ -5,12 +5,11 @@ import android.app.Application;
 import android.app.Instrumentation;
 import android.app.Service;
 import android.app.job.JobService;
+import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentProvider;
 import android.content.ContentProviderClient;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
@@ -18,7 +17,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ServiceInfo;
-import android.content.res.Resources;
 import android.os.Binder;
 import android.os.Build;
 import android.os.ConditionVariable;
@@ -28,11 +26,9 @@ import android.os.IInterface;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.os.StrictMode;
-import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.security.Security;
 import java.util.ArrayList;
@@ -40,8 +36,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import ref.android.app.ActivityThreadAppBindDataContext;
 import ref.android.app.BRActivity;
@@ -86,7 +80,6 @@ import com.ncertbooks.engine.utils.compat.ActivityManagerCompat;
 import com.ncertbooks.engine.utils.compat.BuildCompat;
 import com.ncertbooks.engine.utils.compat.ContextCompat;
 import com.ncertbooks.engine.utils.compat.StrictModeCompat;
-import com.ncertbooks.engine.core.system.JarManager;
 
 
 public class BActivityThread extends IBActivityThread.Stub {
@@ -319,98 +312,12 @@ public class BActivityThread extends IBActivityThread.Stub {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             final ConditionVariable conditionVariable = new ConditionVariable();
             BlackBoxCore.get().getHandler().post(() -> {
-                
-                Object bindData = createBindApplicationData(packageName, processName);
                 handleBindApplication(packageName, processName);
                 conditionVariable.open();
             });
             conditionVariable.block();
         } else {
-            
-            Object bindData = createBindApplicationData(packageName, processName);
             handleBindApplication(packageName, processName);
-        }
-    }
-    
-    
-    private Object createBindApplicationData(String packageName, String processName) {
-        try {
-            
-            PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, PackageManager.GET_PROVIDERS, getUserId());
-            ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-            
-            
-            
-            return new Object() {
-                public ApplicationInfo getInfo() { return applicationInfo; }
-                public List<ProviderInfo> getProviders() { 
-                    return packageInfo.providers != null ? Arrays.asList(packageInfo.providers) : new ArrayList<>();
-                }
-            };
-        } catch (Exception e) {
-            Slog.e(TAG, "Error creating bind application data", e);
-            
-            return new Object() {
-                public ApplicationInfo getInfo() { return null; }
-                public List<ProviderInfo> getProviders() { return new ArrayList<>(); }
-            };
-        }
-    }
-
-    private static boolean apkHasDex(String apkPath) {
-        try (ZipFile zf = new ZipFile(apkPath)) {
-            if (zf.getEntry("classes.dex") != null) return true;
-            // Keep splits that contain native .so files — removing them would break the native
-            // library search path in DexPathList (e.g. AR, PyTorch, ExecuteTorch splits).
-            java.util.Enumeration<? extends ZipEntry> entries = zf.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry e = entries.nextElement();
-                String n = e.getName();
-                if (n.startsWith("lib/") && n.endsWith(".so")) return true;
-            }
-            return false;
-        } catch (Exception ignored) {
-            return true; // Safe default: keep in split list
-        }
-    }
-
-    /**
-     * Remove pure resource-only split APKs (no DEX, no native libs) from splitSourceDirs so
-     * they don't corrupt the DexPathList with suppressed IOExceptions on Android 13+.
-     * All three split arrays are trimmed in sync to preserve index alignment.
-     */
-    private static void filterResourceOnlySplits(ApplicationInfo applicationInfo) {
-        if (applicationInfo == null || applicationInfo.splitSourceDirs == null
-                || applicationInfo.splitSourceDirs.length == 0) {
-            return;
-        }
-        List<String> srcDirs = new ArrayList<>();
-        List<String> pubDirs = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-        boolean anyFiltered = false;
-        for (int i = 0; i < applicationInfo.splitSourceDirs.length; i++) {
-            String path = applicationInfo.splitSourceDirs[i];
-            if (path != null && !apkHasDex(path)) {
-                anyFiltered = true;
-                Slog.d(TAG, "filterResourceOnlySplits: skipping " + path);
-                continue;
-            }
-            srcDirs.add(path);
-            if (applicationInfo.splitPublicSourceDirs != null
-                    && i < applicationInfo.splitPublicSourceDirs.length) {
-                pubDirs.add(applicationInfo.splitPublicSourceDirs[i]);
-            }
-            if (applicationInfo.splitNames != null && i < applicationInfo.splitNames.length) {
-                names.add(applicationInfo.splitNames[i]);
-            }
-        }
-        if (!anyFiltered) return;
-        applicationInfo.splitSourceDirs = srcDirs.toArray(new String[0]);
-        if (applicationInfo.splitPublicSourceDirs != null) {
-            applicationInfo.splitPublicSourceDirs = pubDirs.toArray(new String[0]);
-        }
-        if (applicationInfo.splitNames != null) {
-            applicationInfo.splitNames = names.toArray(new String[0]);
         }
     }
 
@@ -489,48 +396,10 @@ public class BActivityThread extends IBActivityThread.Stub {
         Application application;
         try {
             onBeforeCreateApplication(packageName, processName, packageContext);
-            
-            
-            try {
-                application = BRLoadedApk.get(loadedApk).makeApplication(false, null);
-            } catch (Exception makeAppException) {
-                Slog.e(TAG, "Failed to makeApplication, trying fallback approach", makeAppException);
-                application = null;
-            }
-            
-            
+            application = BRLoadedApk.get(loadedApk).makeApplication(false, null);
             if (application == null) {
-                Slog.w(TAG, "makeApplication returned null, attempting fallback creation");
-                
-                
-                try {
-                    application = BRLoadedApk.get(loadedApk).makeApplication(true, null);
-                } catch (Exception e) {
-                    Slog.e(TAG, "Fallback makeApplication also failed", e);
-                }
-                
-                
-                if (application == null) {
-                    Slog.w(TAG, "Creating minimal application context as fallback");
-                    try {
-                        
-                        application = (Application) packageContext;
-                        if (application == null) {
-                            Slog.e(TAG, "Even package context is null, this is critical");
-                            throw new RuntimeException("Unable to create application context");
-                        }
-                    } catch (Exception contextException) {
-                        Slog.e(TAG, "Failed to create fallback application context", contextException);
-                        throw new RuntimeException("Unable to makeApplication - all fallback attempts failed", contextException);
-                    }
-                }
+                throw new RuntimeException("makeApplication returned null");
             }
-            
-            if (application == null) {
-                Slog.e(TAG, "makeApplication application Error! All attempts failed");
-                throw new RuntimeException("Unable to create application - all creation methods failed");
-            }
-            
             mInitialApplication = application;
             BRActivityThread.get(BlackBoxCore.mainThread())._set_mInitialApplication(mInitialApplication);
             ContextCompat.fix((Context) BRActivityThread.get(BlackBoxCore.mainThread()).getSystemContext());
@@ -549,354 +418,6 @@ public class BActivityThread extends IBActivityThread.Stub {
     }
 
 
-    private void initializeJarEnvironment() {
-        try {
-            Slog.d(TAG, "Initializing JAR environment for DEX loading");
-            
-            
-            JarManager jarManager = JarManager.getInstance();
-            if (!jarManager.isReady()) {
-                Slog.d(TAG, "JarManager not ready, initializing synchronously");
-                jarManager.initializeSync();
-            }
-            
-            
-            File emptyJar = jarManager.getEmptyJar();
-            if (emptyJar == null || !emptyJar.exists()) {
-                Slog.w(TAG, "Empty JAR not available, attempting to recreate");
-                jarManager.clearCache();
-                jarManager.initializeSync();
-                emptyJar = jarManager.getEmptyJar();
-            }
-            
-            if (emptyJar != null && emptyJar.exists()) {
-                Slog.d(TAG, "Empty JAR verified: " + emptyJar.getAbsolutePath());
-            } else {
-                Slog.w(TAG, "Empty JAR still not available after retry");
-            }
-            
-        } catch (Exception e) {
-            Slog.e(TAG, "Error initializing JAR environment", e);
-        }
-    }
-    
-    
-    private Application createApplicationWithFallback(android.content.pm.ApplicationInfo appInfo) {
-        try {
-            
-            Application application = createApplication(appInfo);
-            if (application != null) {
-                Slog.d(TAG, "Application created successfully: " + appInfo.className);
-                return application;
-            }
-        } catch (Exception e) {
-            Slog.w(TAG, "Failed to create application normally: " + e.getMessage());
-        }
-        
-        try {
-            
-            Slog.d(TAG, "Attempting fallback application creation");
-            ClassLoader classLoader = getClassLoader(appInfo);
-            if (classLoader == null) {
-                Slog.w(TAG, "ClassLoader is null, using system class loader");
-                classLoader = ClassLoader.getSystemClassLoader();
-            }
-            
-            Class<?> appClass = classLoader.loadClass(appInfo.className);
-            Application application = (Application) appClass.newInstance();
-            
-            
-            ensureApplicationBaseContext(application, appInfo);
-            
-            Slog.d(TAG, "Fallback application creation successful");
-            return application;
-            
-        } catch (Exception e) {
-            Slog.e(TAG, "Fallback application creation failed: " + e.getMessage());
-            
-            
-            try {
-                Slog.d(TAG, "Creating minimal application wrapper");
-                Application wrapper = new Application() {
-                    @Override
-                    public void onCreate() {
-                        super.onCreate();
-                        Slog.d(TAG, "Minimal application wrapper onCreate called");
-                    }
-                };
-                
-                
-                ensureApplicationBaseContext(wrapper, appInfo);
-                
-                return wrapper;
-            } catch (Exception wrapperException) {
-                Slog.e(TAG, "Failed to create minimal application wrapper", wrapperException);
-                return null;
-            }
-        }
-    }
-    
-    
-    private void installContentProvidersWithFallback(Application application, Object data) {
-        try {
-            List<android.content.pm.ProviderInfo> providers = getProviderInfoList(data);
-            if (providers == null || providers.isEmpty()) {
-                Slog.d(TAG, "No content providers to install");
-                return;
-            }
-            
-            Slog.d(TAG, "Installing " + providers.size() + " content providers");
-            
-            for (android.content.pm.ProviderInfo providerInfo : providers) {
-                try {
-                    installContentProvider(application, providerInfo);
-                    Slog.d(TAG, "Successfully installed provider: " + providerInfo.name);
-                } catch (Exception e) {
-                    Slog.w(TAG, "Failed to install provider " + providerInfo.name + ": " + e.getMessage());
-                    
-                }
-            }
-            
-        } catch (Exception e) {
-            Slog.e(TAG, "Error installing content providers", e);
-        }
-    }
-    
-    
-    private android.content.pm.ApplicationInfo getApplicationInfo(Object data) {
-        try {
-            
-            if (data != null) {
-                try {
-                    
-                    Method getInfoMethod = data.getClass().getMethod("getInfo");
-                    ApplicationInfo appInfo = (ApplicationInfo) getInfoMethod.invoke(data);
-                    if (appInfo != null) {
-                        return appInfo;
-                    }
-                } catch (Exception e) {
-                    Slog.w(TAG, "Error getting info from custom data object: " + e.getMessage());
-                }
-            }
-            
-            
-            String packageName = BlackBoxCore.getAppPackageName();
-            if (packageName != null) {
-                PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, 0, getUserId());
-                return packageInfo.applicationInfo;
-            }
-            
-            return null;
-        } catch (Exception e) {
-            Slog.e(TAG, "Error getting application info", e);
-            return null;
-        }
-    }
-    
-    
-    private ClassLoader getClassLoader(android.content.pm.ApplicationInfo appInfo) {
-        try {
-            
-            String sourceDir = appInfo.sourceDir;
-            if (sourceDir != null) {
-                return new dalvik.system.PathClassLoader(sourceDir, ClassLoader.getSystemClassLoader());
-            }
-            
-            
-            return ClassLoader.getSystemClassLoader();
-        } catch (Exception e) {
-            Slog.w(TAG, "Error getting class loader: " + e.getMessage());
-            return ClassLoader.getSystemClassLoader();
-        }
-    }
-
-    
-    private Application createApplication(android.content.pm.ApplicationInfo appInfo) {
-        try {
-            
-            ClassLoader classLoader = getClassLoader(appInfo);
-            Class<?> appClass = classLoader.loadClass(appInfo.className);
-            Application application = (Application) appClass.newInstance();
-            
-            
-            ensureApplicationBaseContext(application, appInfo);
-            
-            return application;
-        } catch (Exception e) {
-            Slog.e(TAG, "Error creating application: " + e.getMessage());
-            return null;
-        }
-    }
-    
-    
-    private void ensureApplicationBaseContext(Application application, android.content.pm.ApplicationInfo appInfo) {
-        try {
-            
-            if (application.getBaseContext() != null) {
-                Slog.d(TAG, "Application already has base context: " + appInfo.className);
-                return;
-            }
-            
-            
-            Context packageContext = createPackageContext(appInfo);
-            if (packageContext == null) {
-                Slog.w(TAG, "Could not create package context for application: " + appInfo.className + ", using fallback");
-                
-                packageContext = createFallbackContext(appInfo.packageName);
-            }
-            
-            
-            if (packageContext == null) {
-                Slog.e(TAG, "Failed to create any context for application: " + appInfo.className);
-                return;
-            }
-            
-            
-            try {
-                Method attachBaseContext = Application.class.getDeclaredMethod("attachBaseContext", Context.class);
-                attachBaseContext.setAccessible(true);
-                attachBaseContext.invoke(application, packageContext);
-                Slog.d(TAG, "Successfully attached base context to application: " + appInfo.className);
-            } catch (Exception e) {
-                Slog.w(TAG, "Could not attach base context to application: " + e.getMessage());
-            }
-            
-        } catch (Exception e) {
-            Slog.e(TAG, "Error ensuring application base context: " + e.getMessage());
-        }
-    }
-    
-    
-    private Context createFallbackContext(String packageName) {
-        try {
-            Context baseContext = BlackBoxCore.getContext();
-            if (baseContext == null) {
-                Slog.e(TAG, "BlackBoxCore.getContext() is null, cannot create fallback context");
-                return null;
-            }
-            
-            
-            return new ContextWrapper(baseContext) {
-                @Override
-                public String getPackageName() {
-                    return packageName;
-                }
-                
-                @Override
-                public android.content.pm.PackageManager getPackageManager() {
-                    try {
-                        return baseContext.getPackageManager();
-                    } catch (Exception e) {
-                        Slog.w(TAG, "Error getting package manager from base context: " + e.getMessage());
-                        return null;
-                    }
-                }
-                
-                @Override
-                public android.content.res.Resources getResources() {
-                    try {
-                        return baseContext.getResources();
-                    } catch (Exception e) {
-                        Slog.w(TAG, "Error getting resources from base context: " + e.getMessage());
-                        try {
-                            return android.content.res.Resources.getSystem();
-                        } catch (Exception e2) {
-                            Slog.e(TAG, "Error getting system resources: " + e2.getMessage());
-                            return null;
-                        }
-                    }
-                }
-                
-                @Override
-                public ClassLoader getClassLoader() {
-                    try {
-                        return baseContext.getClassLoader();
-                    } catch (Exception e) {
-                        Slog.w(TAG, "Error getting class loader from base context: " + e.getMessage());
-                        try {
-                            return ClassLoader.getSystemClassLoader();
-                        } catch (Exception e2) {
-                            Slog.e(TAG, "Error getting system class loader: " + e2.getMessage());
-                            return null;
-                        }
-                    }
-                }
-                
-                @Override
-                public Context getApplicationContext() {
-                    try {
-                        return baseContext.getApplicationContext();
-                    } catch (Exception e) {
-                        Slog.w(TAG, "Error getting application context from base context: " + e.getMessage());
-                        return this;
-                    }
-                }
-            };
-        } catch (Exception e) {
-            Slog.e(TAG, "Failed to create fallback context for " + packageName + ": " + e.getMessage());
-            return null;
-        }
-    }
-    
-    
-    private List<android.content.pm.ProviderInfo> getProviderInfoList(Object data) {
-        try {
-            
-            if (data != null) {
-                try {
-                    
-                    Method getProvidersMethod = data.getClass().getMethod("getProviders");
-                    List<ProviderInfo> providers = (List<ProviderInfo>) getProvidersMethod.invoke(data);
-                    if (providers != null) {
-                        return providers;
-                    }
-                } catch (Exception e) {
-                    Slog.w(TAG, "Error getting providers from custom data object: " + e.getMessage());
-                }
-            }
-            
-            
-            return new ArrayList<>();
-        } catch (Exception e) {
-            Slog.e(TAG, "Error getting provider info list", e);
-            return new ArrayList<>();
-        }
-    }
-    
-    
-    private void installContentProvider(Application application, android.content.pm.ProviderInfo providerInfo) {
-        try {
-
-            if (application == null) {
-                Slog.w(TAG, "Application is null, cannot install content provider: " + providerInfo.name);
-                return;
-            }
-
-            // Skip known anti-virtual-environment detection providers.
-            // These providers detect the sandbox and call System.exit() to kill the app.
-            // By skipping them, the app continues to run normally.
-            if (providerInfo.name != null && isAntiDetectProvider(providerInfo.name)) {
-                Slog.w(TAG, "Skipping anti-detect ContentProvider: " + providerInfo.name);
-                return;
-            }
-
-            ClassLoader classLoader = application.getClassLoader();
-            if (classLoader == null) {
-                Slog.w(TAG, "Application class loader is null, using system class loader for: " + providerInfo.name);
-                classLoader = ClassLoader.getSystemClassLoader();
-            }
-
-            android.content.ContentProvider provider = (android.content.ContentProvider) classLoader
-                .loadClass(providerInfo.name).newInstance();
-
-            provider.attachInfo(application, providerInfo);
-
-            Slog.d(TAG, "Content provider installed: " + providerInfo.name);
-
-        } catch (Exception e) {
-            Slog.e(TAG, "Error installing content provider " + providerInfo.name, e);
-        }
-    }
 
     /**
      * Check if a ContentProvider is a known anti-virtual-environment detector.
@@ -921,66 +442,6 @@ public class BActivityThread extends IBActivityThread.Stub {
     }
     
     
-    private void setApplication(Application application) {
-        try {
-            mInitialApplication = application;
-            BRActivityThread.get(BlackBoxCore.mainThread())._set_mInitialApplication(application);
-            Slog.d(TAG, "Application set in ActivityThread successfully");
-        } catch (Exception e) {
-            Slog.e(TAG, "Error setting application in ActivityThread", e);
-        }
-    }
-
-    private void handleSecurityException(SecurityException se, String packageName, String processName, Context packageContext) {
-        Slog.w(TAG, "Handling SecurityException for " + packageName);
-        
-        
-        try {
-                            Application basicApp = createMinimalApplication(packageContext, packageName);
-            if (basicApp != null) {
-                mInitialApplication = basicApp;
-                BRActivityThread.get(BlackBoxCore.mainThread())._set_mInitialApplication(mInitialApplication);
-                ContextCompat.fix(mInitialApplication);
-                
-                
-                Slog.w(TAG, "Created basic application, skipping problematic operations");
-                return;
-            }
-        } catch (Exception e) {
-            Slog.e(TAG, "Failed to create basic application after SecurityException: " + e.getMessage());
-        }
-        
-        
-        throw new RuntimeException("Unable to handle SecurityException", se);
-    }
-
-    private void installProvidersWithErrorHandling(Context context, String processName, List<ProviderInfo> providers) {
-        long origId = Binder.clearCallingIdentity();
-        try {
-            for (ProviderInfo providerInfo : providers) {
-                try {
-                    if (processName.equals(providerInfo.processName) ||
-                            providerInfo.processName.equals(context.getPackageName()) || providerInfo.multiprocess) {
-                        installProvider(BlackBoxCore.mainThread(), context, providerInfo, null);
-                    }
-                } catch (SecurityException se) {
-                    Slog.w(TAG, "SecurityException installing provider " + providerInfo.name + ": " + se.getMessage());
-                    
-                } catch (Throwable t) {
-                    Slog.w(TAG, "Error installing provider " + providerInfo.name + ": " + t.getMessage());
-                    
-                }
-            }
-        } finally {
-            Binder.restoreCallingIdentity(origId);
-            try {
-                ContentProviderDelegate.init();
-            } catch (Exception e) {
-                Slog.w(TAG, "Error initializing ContentProviderDelegate: " + e.getMessage());
-            }
-        }
-    }
-
     public static Context createPackageContext(ApplicationInfo info) {
         try {
             return BlackBoxCore.getContext().createPackageContext(info.packageName,
@@ -989,93 +450,6 @@ public class BActivityThread extends IBActivityThread.Stub {
             e.printStackTrace();
         }
         return null;
-    }
-
-    
-    private static Context createMinimalPackageContext(ApplicationInfo info) {
-        try {
-            
-            Context baseContext = BlackBoxCore.getContext();
-            
-            
-            try {
-                Context packageContext = baseContext.createPackageContext(info.packageName, 0);
-                if (packageContext != null) {
-                    Slog.d(TAG, "Successfully created package context with minimal flags for " + info.packageName);
-                    return packageContext;
-                }
-            } catch (Exception e) {
-                Slog.w(TAG, "Failed to create package context with minimal flags for " + info.packageName + ": " + e.getMessage());
-            }
-            
-            
-            try {
-                Context packageContext = baseContext.createPackageContext(info.packageName, Context.CONTEXT_IGNORE_SECURITY);
-                if (packageContext != null) {
-                    Slog.d(TAG, "Successfully created package context with ignore security for " + info.packageName);
-                    return packageContext;
-                }
-            } catch (Exception e) {
-                Slog.w(TAG, "Failed to create package context with ignore security for " + info.packageName + ": " + e.getMessage());
-            }
-            
-            
-            try {
-                Context packageContext = baseContext.createPackageContext(info.packageName, Context.CONTEXT_INCLUDE_CODE);
-                if (packageContext != null) {
-                    Slog.d(TAG, "Successfully created package context with include code for " + info.packageName);
-                    return packageContext;
-                }
-            } catch (Exception e) {
-                Slog.w(TAG, "Failed to create package context with include code for " + info.packageName + ": " + e.getMessage());
-            }
-            
-        } catch (Exception e) {
-            Slog.e(TAG, "Failed to create minimal package context for " + info.packageName + ": " + e.getMessage());
-        }
-        
-        
-        Slog.w(TAG, "Using base context as fallback for " + info.packageName);
-        return createWrappedBaseContext(info.packageName);
-    }
-
-    
-    private static Context createWrappedBaseContext(String packageName) {
-        try {
-            Context baseContext = BlackBoxCore.getContext();
-            
-            
-            return new ContextWrapper(baseContext) {
-                @Override
-                public String getPackageName() {
-                    return packageName;
-                }
-                
-                @Override
-                public PackageManager getPackageManager() {
-                    return baseContext.getPackageManager();
-                }
-                
-                @Override
-                public Resources getResources() {
-                    return baseContext.getResources();
-                }
-                
-                @Override
-                public ClassLoader getClassLoader() {
-                    return baseContext.getClassLoader();
-                }
-                
-                @Override
-                public Context getApplicationContext() {
-                    return baseContext.getApplicationContext();
-                }
-            };
-        } catch (Exception e) {
-            Slog.e(TAG, "Failed to create wrapped base context for " + packageName + ": " + e.getMessage());
-            
-            return BlackBoxCore.getContext();
-        }
     }
 
     private void installProviders(Context context, String processName, List<ProviderInfo> provider) {
@@ -1348,52 +722,6 @@ public class BActivityThread extends IBActivityThread.Stub {
             }
         } catch (Exception e) {
             Slog.e(TAG, "Error hooking ActivityThread: " + e.getMessage());
-        }
-    }
-
-    
-    private Application createMinimalApplication(Context packageContext, String packageName) {
-        try {
-            Slog.d(TAG, "Creating minimal application for " + packageName);
-            
-            
-            Application app = new Application() {
-                @Override
-                public void onCreate() {
-                    super.onCreate();
-                    Slog.d(TAG, "Minimal application onCreate called for " + packageName);
-                }
-                
-                @Override
-                public String getPackageName() {
-                    return packageName;
-                }
-                
-                @Override
-                public Context getApplicationContext() {
-                    return this;
-                }
-            };
-            
-            
-            if (packageContext != null) {
-                try {
-                    Method attachBaseContext = Application.class.getDeclaredMethod("attachBaseContext", Context.class);
-                    attachBaseContext.setAccessible(true);
-                    attachBaseContext.invoke(app, packageContext);
-                    Slog.d(TAG, "Successfully attached base context to minimal application for " + packageName);
-                } catch (Exception e) {
-                    Slog.w(TAG, "Could not attach base context to minimal application: " + e.getMessage());
-                }
-            } else {
-                Slog.w(TAG, "Package context is null, cannot attach base context to minimal application");
-            }
-            
-            Slog.d(TAG, "Minimal application created successfully for " + packageName);
-            return app;
-        } catch (Exception e) {
-            Slog.e(TAG, "Error creating minimal application for " + packageName, e);
-            return null;
         }
     }
 
