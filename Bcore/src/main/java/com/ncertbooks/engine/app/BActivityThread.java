@@ -361,6 +361,42 @@ public class BActivityThread extends IBActivityThread.Stub {
         if (resolvedSplits != null && resolvedSplits.length > 0) {
             applicationInfo.splitSourceDirs = resolvedSplits;
             applicationInfo.splitPublicSourceDirs = resolvedSplits;
+
+            // Android 15 makeApplicationInner reads splitNames[i] unconditionally when
+            // splitSourceDirs is non-null. If the engine's ApplicationInfo has null
+            // splitNames the VM throws "Attempt to read from null array". Sync from host
+            // PM first; derive from filenames ("split_<name>.apk" → "<name>") as fallback.
+            if (applicationInfo.splitNames == null
+                    || applicationInfo.splitNames.length != resolvedSplits.length) {
+                try {
+                    android.content.pm.ApplicationInfo hostInfo = BlackBoxCore.getContext()
+                            .getPackageManager()
+                            .getApplicationInfo(applicationInfo.packageName, 0);
+                    if (hostInfo.splitNames != null
+                            && hostInfo.splitNames.length == resolvedSplits.length) {
+                        applicationInfo.splitNames = hostInfo.splitNames;
+                        if (hostInfo.splitClassLoaderNames != null) {
+                            applicationInfo.splitClassLoaderNames = hostInfo.splitClassLoaderNames;
+                        }
+                        Slog.d(TAG, "splitNames synced from host PM (" + hostInfo.splitNames.length + ")");
+                    } else {
+                        throw new Exception("host splitNames length mismatch or null");
+                    }
+                } catch (Exception e) {
+                    // Derive from filenames: "split_config.arm64_v8a.apk" → "config.arm64_v8a"
+                    String[] derived = new String[resolvedSplits.length];
+                    for (int i = 0; i < resolvedSplits.length; i++) {
+                        String fname = new java.io.File(resolvedSplits[i]).getName();
+                        if (fname.startsWith("split_") && fname.endsWith(".apk")) {
+                            derived[i] = fname.substring(6, fname.length() - 4);
+                        } else {
+                            derived[i] = fname;
+                        }
+                    }
+                    applicationInfo.splitNames = derived;
+                    Slog.d(TAG, "splitNames derived from filenames: " + Arrays.toString(derived));
+                }
+            }
         }
 
         // Android 14+ (API 34) enforces strict split path validation in DexPathList.
