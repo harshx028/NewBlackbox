@@ -29,13 +29,22 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.webkit.WebView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import dalvik.system.InMemoryDexClassLoader;
 
 import ref.android.app.ActivityThreadAppBindDataContext;
 import ref.android.app.BRActivity;
@@ -345,8 +354,11 @@ public class BActivityThread extends IBActivityThread.Stub {
         Context packageContext = createPackageContext(applicationInfo);
         Object loadedApk = BRContextImpl.get(packageContext).mPackageInfo();
         BRLoadedApk.get(loadedApk)._set_mSecurityViolation(false);
-        
         BRLoadedApk.get(loadedApk)._set_mApplicationInfo(applicationInfo);
+
+        // Preload Helium/split-embedded DEX before makeApplication() so module
+        // classloaders are ready when Application.onCreate() bootstraps Helium.
+        preloadSplitDex(applicationInfo, loadedApk, BRLoadedApk.get(loadedApk).getClassLoader());
 
         int targetSdkVersion = applicationInfo.targetSdkVersion;
         if (targetSdkVersion < Build.VERSION_CODES.GINGERBREAD) {
@@ -442,6 +454,74 @@ public class BActivityThread extends IBActivityThread.Stub {
     }
     
     
+    /**
+     * Walk every split APK and look for assets/<splitName>/classes.dex — the layout
+     * used by Instagram's Helium framework. Collect all such DEX buffers into a single
+     * InMemoryDexClassLoader chained on top of the LoadedApk's existing classloader,
+     * then inject it back into the LoadedApk's mClassLoader and set it as the thread
+     * context classloader.
+     *
+     * This runs BEFORE makeApplication() so Application.onCreate() sees the complete
+     * classloader chain when Helium's bootstrapper calls loadClass(). InMemoryDexClassLoader
+     * sidesteps Android 10+ writable-path restrictions and Android 16's useEmbeddedDex
+     * enforcement since the bytes live only in heap memory.
+     */
+    private static void preloadSplitDex(ApplicationInfo applicationInfo, Object loadedApkInstance, ClassLoader baseLoader) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        if (applicationInfo.splitSourceDirs == null || applicationInfo.splitSourceDirs.length == 0) return;
+
+        List<ByteBuffer> dexBuffers = new ArrayList<>();
+        for (String splitPath : applicationInfo.splitSourceDirs) {
+            if (splitPath == null) continue;
+            String fileName = new java.io.File(splitPath).getName();
+            if (!fileName.startsWith("split_")) continue;
+            int dot = fileName.lastIndexOf('.');
+            String splitName = fileName.substring(6, dot > 6 ? dot : fileName.length());
+
+            String assetEntry = "assets/" + splitName + "/classes.dex";
+            try (ZipFile zip = new ZipFile(splitPath)) {
+                ZipEntry entry = zip.getEntry(assetEntry);
+                if (entry == null) continue;
+                byte[] bytes = readStreamFully(zip.getInputStream(entry));
+                dexBuffers.add(ByteBuffer.wrap(bytes));
+                Slog.d(TAG, "preloadSplitDex: " + assetEntry + " (" + bytes.length + " B)");
+            } catch (IOException e) {
+                Slog.w(TAG, "preloadSplitDex: skip " + splitPath + ": " + e.getMessage());
+            }
+        }
+
+        if (dexBuffers.isEmpty()) return;
+
+        ClassLoader combined = new InMemoryDexClassLoader(
+                dexBuffers.toArray(new ByteBuffer[0]), baseLoader);
+        Slog.d(TAG, "preloadSplitDex: built InMemoryDexClassLoader (" + dexBuffers.size() + " DEXes)");
+
+        // Inject into the real android.app.LoadedApk so getClassLoader() returns the combined chain.
+        try {
+            Class<?> cls = Class.forName("android.app.LoadedApk");
+            Field f = cls.getDeclaredField("mClassLoader");
+            f.setAccessible(true);
+            f.set(loadedApkInstance, combined);
+            Slog.d(TAG, "preloadSplitDex: mClassLoader injected");
+        } catch (Exception e) {
+            Slog.w(TAG, "preloadSplitDex: mClassLoader inject failed: " + e.getMessage());
+        }
+
+        // Thread context classloader: Helium reads this directly in some code paths.
+        Thread.currentThread().setContextClassLoader(combined);
+    }
+
+    private static byte[] readStreamFully(InputStream is) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = is.read(buf)) > 0) baos.write(buf, 0, n);
+            return baos.toByteArray();
+        } finally {
+            try { is.close(); } catch (IOException ignored) {}
+        }
+    }
+
     public static Context createPackageContext(ApplicationInfo info) {
         try {
             return BlackBoxCore.getContext().createPackageContext(info.packageName,
