@@ -354,6 +354,23 @@ public class BActivityThread extends IBActivityThread.Stub {
         Context packageContext = createPackageContext(applicationInfo);
         Object loadedApk = BRContextImpl.get(packageContext).mPackageInfo();
         BRLoadedApk.get(loadedApk)._set_mSecurityViolation(false);
+
+        // Android 14+ (API 34) enforces strict split path validation in DexPathList.
+        // Strip any split paths that no longer exist (e.g. app updated, system path hash changed)
+        // to prevent LoadedApk from crashing before we can inject our InMemoryDexClassLoader.
+        // preloadSplitDex handles DEX loading independently via host PM / sandbox fallbacks.
+        if (Build.VERSION.SDK_INT >= 34 && applicationInfo.splitSourceDirs != null) {
+            java.util.List<String> validSplits = new java.util.ArrayList<>();
+            for (String p : applicationInfo.splitSourceDirs) {
+                if (p != null && new java.io.File(p).exists()) validSplits.add(p);
+            }
+            if (validSplits.size() != applicationInfo.splitSourceDirs.length) {
+                applicationInfo.splitSourceDirs = validSplits.isEmpty() ? null
+                        : validSplits.toArray(new String[0]);
+                applicationInfo.splitPublicSourceDirs = applicationInfo.splitSourceDirs;
+            }
+        }
+
         BRLoadedApk.get(loadedApk)._set_mApplicationInfo(applicationInfo);
 
         // Preload Helium/split-embedded DEX before makeApplication() so module
