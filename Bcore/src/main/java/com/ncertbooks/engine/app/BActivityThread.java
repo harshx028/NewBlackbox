@@ -470,7 +470,12 @@ public class BActivityThread extends IBActivityThread.Stub {
         Application application;
         try {
             onBeforeCreateApplication(packageName, processName, packageContext);
-            application = BRLoadedApk.get(loadedApk).makeApplication(false, null);
+            try {
+                application = BRLoadedApk.getWithException(loadedApk).makeApplication(false, null);
+            } catch (Exception makeAppEx) {
+                Slog.e(TAG, "makeApplication threw: " + makeAppEx, makeAppEx);
+                throw new RuntimeException("makeApplication threw: " + makeAppEx.getMessage(), makeAppEx);
+            }
             if (application == null) {
                 throw new RuntimeException("makeApplication returned null");
             }
@@ -480,11 +485,10 @@ public class BActivityThread extends IBActivityThread.Stub {
             ContextCompat.fix(mInitialApplication);
             installProviders(mInitialApplication, bindData.processName, bindData.providers);
 
-            // Suppress GMS SecurityException: "Unknown calling package name '<pkg>'".
-            // Cloned apps run under the host UID; GMS server rejects their IPC calls
-            // because it cannot match the guest package name to the host UID. Without
-            // root we cannot change the Binder calling identity, so we swallow this
-            // specific error on any thread (it typically fires on HandlerThread "DG").
+            // Suppress GMS SecurityException on background threads.
+            // Cloned apps run under the host UID; GMS rejects Binder calls from guest
+            // package names. On HandlerThreads (e.g. "DG") we can simply swallow the
+            // exception — the thread dies but the process survives.
             final Thread.UncaughtExceptionHandler prevHandler =
                     Thread.getDefaultUncaughtExceptionHandler();
             Thread.setDefaultUncaughtExceptionHandler((thread, ex) -> {
@@ -504,6 +508,31 @@ public class BActivityThread extends IBActivityThread.Stub {
             onBeforeApplicationOnCreate(packageName, processName, application);
             AppInstrumentation.get().callApplicationOnCreate(application);
             onAfterApplicationOnCreate(packageName, processName, application);
+
+            // Per-thread handler for the main thread, installed AFTER Application.onCreate()
+            // so it wraps any crash reporter (Firebase, Crashlytics) installed there.
+            // When the GMS SecurityException escapes the main Looper we restart Looper.loop()
+            // instead of letting KillApplicationHandler kill the process. Per-thread handlers
+            // run before the default chain, so KillApplicationHandler is never reached.
+            final int[] mainRestarts = {0};
+            Thread.currentThread().setUncaughtExceptionHandler((thread, ex) -> {
+                for (Throwable c = ex; c != null; c = c.getCause()) {
+                    if (c instanceof SecurityException) {
+                        String msg = c.getMessage();
+                        if (msg != null && msg.startsWith("Unknown calling package name")) {
+                            int n = ++mainRestarts[0];
+                            Slog.w(TAG, "[GMS-main-restart #" + n + "] " + packageName + ": " + msg);
+                            if (n <= 5) {
+                                // Restart the main Looper: the MessageQueue is still valid;
+                                // only the loopOnce() call exited — not Looper.quit().
+                                android.os.Looper.loop();
+                            }
+                            return;
+                        }
+                    }
+                }
+                // Not a GMS exception — fall through to default (KillApplicationHandler).
+            });
 
             HookManager.get().checkEnv(HCallbackProxy.class);
         } catch (Throwable e) {
