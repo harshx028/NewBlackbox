@@ -404,6 +404,20 @@ public class BActivityThread extends IBActivityThread.Stub {
 
         BRLoadedApk.get(loadedApk)._set_mApplicationInfo(applicationInfo);
 
+        // Force createOrUpdateClassLoaderLocked to run with the correct splitSourceDirs.
+        // If the LoadedApk came from the ActivityThread cache it may already have an
+        // mClassLoader built without split paths, and mAppComponentFactory unset.
+        // Clearing mClassLoader makes getClassLoader() recreate it — including splits
+        // and mAppComponentFactory — before we wrap it in InMemoryDexClassLoader.
+        try {
+            Class<?> loadedApkClass = Class.forName("android.app.LoadedApk");
+            Field mClField = loadedApkClass.getDeclaredField("mClassLoader");
+            mClField.setAccessible(true);
+            mClField.set(loadedApk, null);
+        } catch (Exception e) {
+            Slog.w(TAG, "mClassLoader pre-clear failed: " + e.getMessage());
+        }
+
         // Preload Helium/split-embedded DEX before makeApplication() so module
         // classloaders are ready when Application.onCreate() bootstraps Helium.
         preloadSplitDex(applicationInfo, loadedApk, BRLoadedApk.get(loadedApk).getClassLoader());
