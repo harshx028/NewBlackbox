@@ -355,10 +355,22 @@ public class BActivityThread extends IBActivityThread.Stub {
         Object loadedApk = BRContextImpl.get(packageContext).mPackageInfo();
         BRLoadedApk.get(loadedApk)._set_mSecurityViolation(false);
 
+        // For FLAG_STORAGE installs only base.apk is stored in the engine sandbox, so
+        // splitSourceDirs is null on the engine's ApplicationInfo. Populate it from the
+        // host PackageManager so that:
+        //   1. ResourcesManager loads split resource APKs (theme attribute resolution)
+        //   2. preloadSplitDex can read split DEX (Helium / module frameworks)
+        // Fall back to sandbox-copied splits when the original app is uninstalled.
+        if (applicationInfo.splitSourceDirs == null || applicationInfo.splitSourceDirs.length == 0) {
+            String[] hostSplits = resolveHostSplitPaths(applicationInfo.packageName);
+            if (hostSplits != null && hostSplits.length > 0) {
+                applicationInfo.splitSourceDirs = hostSplits;
+                applicationInfo.splitPublicSourceDirs = hostSplits;
+            }
+        }
+
         // Android 14+ (API 34) enforces strict split path validation in DexPathList.
-        // Strip any split paths that no longer exist (e.g. app updated, system path hash changed)
-        // to prevent LoadedApk from crashing before we can inject our InMemoryDexClassLoader.
-        // preloadSplitDex handles DEX loading independently via host PM / sandbox fallbacks.
+        // Strip any split paths that no longer exist (e.g. app updated, system APK hash changed).
         if (Build.VERSION.SDK_INT >= 34 && applicationInfo.splitSourceDirs != null) {
             java.util.List<String> validSplits = new java.util.ArrayList<>();
             for (String p : applicationInfo.splitSourceDirs) {
@@ -483,36 +495,47 @@ public class BActivityThread extends IBActivityThread.Stub {
      * sidesteps Android 10+ writable-path restrictions and Android 16's useEmbeddedDex
      * enforcement since the bytes live only in heap memory.
      */
+    /**
+     * Returns split APK paths for {@code packageName}, trying three sources in order:
+     * 1. Host PackageManager (original app still installed — fastest, most complete)
+     * 2. Sandbox-copied splits in data/app/<pkg>/ (original uninstalled, CloneManagerModule copied them)
+     * Returns null when no splits are found.
+     */
+    private static String[] resolveHostSplitPaths(String packageName) {
+        // 1. Host PM
+        try {
+            android.content.pm.ApplicationInfo hostInfo = BlackBoxCore.getContext()
+                    .getPackageManager()
+                    .getApplicationInfo(packageName, 0);
+            if (hostInfo.splitSourceDirs != null && hostInfo.splitSourceDirs.length > 0) {
+                return hostInfo.splitSourceDirs;
+            }
+        } catch (Exception ignored) {}
+
+        // 2. Sandbox copies
+        java.io.File appDir = com.ncertbooks.engine.core.env.BEnvironment.getAppDir(packageName);
+        if (appDir.exists()) {
+            java.io.File[] splits = appDir.listFiles(
+                    (dir, name) -> name.startsWith("split_") && name.endsWith(".apk"));
+            if (splits != null && splits.length > 0) {
+                String[] paths = new String[splits.length];
+                for (int i = 0; i < splits.length; i++) paths[i] = splits[i].getAbsolutePath();
+                return paths;
+            }
+        }
+        return null;
+    }
+
     private static void preloadSplitDex(ApplicationInfo applicationInfo, Object loadedApkInstance, ClassLoader baseLoader) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
 
+        // By this point handleBindApplication has already called resolveHostSplitPaths and
+        // populated applicationInfo.splitSourceDirs, so we can use it directly.
+        // Fall back via resolveHostSplitPaths again in case something cleared it.
         String[] splitPaths = applicationInfo.splitSourceDirs;
-
-        // For FLAG_STORAGE installs only the base APK is copied into the engine sandbox,
-        // so splitSourceDirs is null on the engine's ApplicationInfo. Fall back to the host
-        // PackageManager while the original is still installed.
         if (splitPaths == null || splitPaths.length == 0) {
-            try {
-                android.content.pm.ApplicationInfo hostInfo = BlackBoxCore.getContext()
-                        .getPackageManager()
-                        .getApplicationInfo(applicationInfo.packageName, 0);
-                splitPaths = hostInfo.splitSourceDirs;
-            } catch (Exception ignored) {}
+            splitPaths = resolveHostSplitPaths(applicationInfo.packageName);
         }
-
-        // Second fallback: splits copied to sandbox during cloneApp (works after original uninstall).
-        if (splitPaths == null || splitPaths.length == 0) {
-            java.io.File appDir = com.ncertbooks.engine.core.env.BEnvironment.getAppDir(applicationInfo.packageName);
-            if (appDir.exists()) {
-                java.io.File[] sandboxSplits = appDir.listFiles(
-                        (dir, name) -> name.startsWith("split_") && name.endsWith(".apk"));
-                if (sandboxSplits != null && sandboxSplits.length > 0) {
-                    splitPaths = new String[sandboxSplits.length];
-                    for (int i = 0; i < sandboxSplits.length; i++) splitPaths[i] = sandboxSplits[i].getAbsolutePath();
-                }
-            }
-        }
-
         if (splitPaths == null || splitPaths.length == 0) return;
 
         List<ByteBuffer> dexBuffers = new ArrayList<>();
