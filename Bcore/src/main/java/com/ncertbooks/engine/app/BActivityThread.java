@@ -375,9 +375,6 @@ public class BActivityThread extends IBActivityThread.Stub {
                     if (hostInfo.splitNames != null
                             && hostInfo.splitNames.length == resolvedSplits.length) {
                         applicationInfo.splitNames = hostInfo.splitNames;
-                        if (hostInfo.splitClassLoaderNames != null) {
-                            applicationInfo.splitClassLoaderNames = hostInfo.splitClassLoaderNames;
-                        }
                         Slog.d(TAG, "splitNames synced from host PM (" + hostInfo.splitNames.length + ")");
                     } else {
                         throw new Exception("host splitNames length mismatch or null");
