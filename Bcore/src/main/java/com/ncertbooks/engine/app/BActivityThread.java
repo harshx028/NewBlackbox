@@ -480,6 +480,27 @@ public class BActivityThread extends IBActivityThread.Stub {
             ContextCompat.fix(mInitialApplication);
             installProviders(mInitialApplication, bindData.processName, bindData.providers);
 
+            // Suppress GMS SecurityException: "Unknown calling package name '<pkg>'".
+            // Cloned apps run under the host UID; GMS server rejects their IPC calls
+            // because it cannot match the guest package name to the host UID. Without
+            // root we cannot change the Binder calling identity, so we swallow this
+            // specific error on any thread (it typically fires on HandlerThread "DG").
+            final Thread.UncaughtExceptionHandler prevHandler =
+                    Thread.getDefaultUncaughtExceptionHandler();
+            Thread.setDefaultUncaughtExceptionHandler((thread, ex) -> {
+                for (Throwable c = ex; c != null; c = c.getCause()) {
+                    if (c instanceof SecurityException) {
+                        String msg = c.getMessage();
+                        if (msg != null && msg.startsWith("Unknown calling package name")) {
+                            Slog.w(TAG, "[GMS-suppress] " + packageName
+                                    + " on " + thread.getName() + ": " + msg);
+                            return;
+                        }
+                    }
+                }
+                if (prevHandler != null) prevHandler.uncaughtException(thread, ex);
+            });
+
             onBeforeApplicationOnCreate(packageName, processName, application);
             AppInstrumentation.get().callApplicationOnCreate(application);
             onAfterApplicationOnCreate(packageName, processName, application);
