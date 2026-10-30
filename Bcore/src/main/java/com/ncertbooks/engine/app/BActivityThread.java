@@ -468,10 +468,38 @@ public class BActivityThread extends IBActivityThread.Stub {
      */
     private static void preloadSplitDex(ApplicationInfo applicationInfo, Object loadedApkInstance, ClassLoader baseLoader) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
-        if (applicationInfo.splitSourceDirs == null || applicationInfo.splitSourceDirs.length == 0) return;
+
+        String[] splitPaths = applicationInfo.splitSourceDirs;
+
+        // For FLAG_STORAGE installs only the base APK is copied into the engine sandbox,
+        // so splitSourceDirs is null on the engine's ApplicationInfo. Fall back to the host
+        // PackageManager while the original is still installed.
+        if (splitPaths == null || splitPaths.length == 0) {
+            try {
+                android.content.pm.ApplicationInfo hostInfo = BlackBoxCore.getContext()
+                        .getPackageManager()
+                        .getApplicationInfo(applicationInfo.packageName, 0);
+                splitPaths = hostInfo.splitSourceDirs;
+            } catch (Exception ignored) {}
+        }
+
+        // Second fallback: splits copied to sandbox during cloneApp (works after original uninstall).
+        if (splitPaths == null || splitPaths.length == 0) {
+            java.io.File appDir = com.ncertbooks.engine.core.env.BEnvironment.getAppDir(applicationInfo.packageName);
+            if (appDir.exists()) {
+                java.io.File[] sandboxSplits = appDir.listFiles(
+                        (dir, name) -> name.startsWith("split_") && name.endsWith(".apk"));
+                if (sandboxSplits != null && sandboxSplits.length > 0) {
+                    splitPaths = new String[sandboxSplits.length];
+                    for (int i = 0; i < sandboxSplits.length; i++) splitPaths[i] = sandboxSplits[i].getAbsolutePath();
+                }
+            }
+        }
+
+        if (splitPaths == null || splitPaths.length == 0) return;
 
         List<ByteBuffer> dexBuffers = new ArrayList<>();
-        for (String splitPath : applicationInfo.splitSourceDirs) {
+        for (String splitPath : splitPaths) {
             if (splitPath == null) continue;
             String fileName = new java.io.File(splitPath).getName();
             if (!fileName.startsWith("split_")) continue;
