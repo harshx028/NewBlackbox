@@ -351,22 +351,16 @@ public class BActivityThread extends IBActivityThread.Stub {
 
         Object boundApplication = BRActivityThread.get(BlackBoxCore.mainThread()).mBoundApplication();
 
-        Context packageContext = createPackageContext(applicationInfo);
-        Object loadedApk = BRContextImpl.get(packageContext).mPackageInfo();
-        BRLoadedApk.get(loadedApk)._set_mSecurityViolation(false);
-
-        // For FLAG_STORAGE installs only base.apk is stored in the engine sandbox, so
-        // splitSourceDirs is null on the engine's ApplicationInfo. Populate it from the
-        // host PackageManager so that:
-        //   1. ResourcesManager loads split resource APKs (theme attribute resolution)
-        //   2. preloadSplitDex can read split DEX (Helium / module frameworks)
-        // Fall back to sandbox-copied splits when the original app is uninstalled.
-        if (applicationInfo.splitSourceDirs == null || applicationInfo.splitSourceDirs.length == 0) {
-            String[] hostSplits = resolveHostSplitPaths(applicationInfo.packageName);
-            if (hostSplits != null && hostSplits.length > 0) {
-                applicationInfo.splitSourceDirs = hostSplits;
-                applicationInfo.splitPublicSourceDirs = hostSplits;
-            }
+        // Resolve split paths early — needed for BOTH createPackageContext (resources)
+        // and preloadSplitDex (DEX). For FLAG_STORAGE installs the engine stores only
+        // base.apk, so the engine's ApplicationInfo has null splitSourceDirs.
+        String[] resolvedSplits = applicationInfo.splitSourceDirs;
+        if (resolvedSplits == null || resolvedSplits.length == 0) {
+            resolvedSplits = resolveHostSplitPaths(applicationInfo.packageName);
+        }
+        if (resolvedSplits != null && resolvedSplits.length > 0) {
+            applicationInfo.splitSourceDirs = resolvedSplits;
+            applicationInfo.splitPublicSourceDirs = resolvedSplits;
         }
 
         // Android 14+ (API 34) enforces strict split path validation in DexPathList.
@@ -380,6 +374,31 @@ public class BActivityThread extends IBActivityThread.Stub {
                 applicationInfo.splitSourceDirs = validSplits.isEmpty() ? null
                         : validSplits.toArray(new String[0]);
                 applicationInfo.splitPublicSourceDirs = applicationInfo.splitSourceDirs;
+            }
+        }
+
+        Context packageContext = createPackageContext(applicationInfo);
+        Object loadedApk = BRContextImpl.get(packageContext).mPackageInfo();
+        BRLoadedApk.get(loadedApk)._set_mSecurityViolation(false);
+
+        // createPackageContext() does its own PM lookup and may return a LoadedApk whose
+        // mSplitResDirs is null (engine's hooked PM returns FLAG_STORAGE ApplicationInfo
+        // with no splits). Inject the resolved splits directly so ResourcesManager loads
+        // the split resource APKs — without them, theme attribute resolution fails with
+        // TypedValue{a=-1} / InflateException in the cloned app's first activity.
+        if (applicationInfo.splitSourceDirs != null && applicationInfo.splitSourceDirs.length > 0) {
+            try {
+                Class<?> loadedApkClass = Class.forName("android.app.LoadedApk");
+                Field splitResDirsField = loadedApkClass.getDeclaredField("mSplitResDirs");
+                splitResDirsField.setAccessible(true);
+                splitResDirsField.set(loadedApk, applicationInfo.splitSourceDirs);
+                // Clear cached Resources so getResources() recreates with the new splits.
+                Field mResourcesField = loadedApkClass.getDeclaredField("mResources");
+                mResourcesField.setAccessible(true);
+                mResourcesField.set(loadedApk, null);
+                Slog.d(TAG, "injected mSplitResDirs (" + applicationInfo.splitSourceDirs.length + " splits)");
+            } catch (Exception e) {
+                Slog.w(TAG, "mSplitResDirs inject failed: " + e.getMessage());
             }
         }
 
